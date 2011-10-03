@@ -8,7 +8,8 @@ package Util;
 our @EXPORT = qw(
     hash_walk
     print_keys_and_value
-    imprimir_lista_encuestas
+    imprimir_maestro
+    imprimir_argumentos
 );
 
 sub hash_walk {
@@ -38,7 +39,17 @@ sub print_keys_and_value {
     printf "k = %-8s  v = %-4s  key_list = [%s]\n", $k, $v, "@$key_list";
 }
 
-sub imprimir_lista {
+sub imprimir_argumentos {
+    my ($nombre, @lista) = @_;
+    if ($#lista != -1) {
+        print "$nombre\n";
+        foreach my $item (@lista) {
+            print "    $item\n";
+        }
+    }
+}
+
+sub imprimir_maestro {
     my($lista) = @_;
     while (my ($k1,$v1) = each %$lista) {
         while (my ($k2, $v2) = each %$v1) {
