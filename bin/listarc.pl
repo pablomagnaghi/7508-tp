@@ -3,15 +3,17 @@
 use strict;
 use warnings;
 
+use lib '../lib';
 use Util;
 use Lib;
-use Switch;
+
 
 
 # Los datos que hacen falta de la configuracion son:
 #    ~/grupo2/mae
 #    ~/grupo2/ya/encuestas.sum
-#    ~/grupo2/ya/ 
+#    ~/grupo2/ya/
+#    ~/grupo2/lib/ 
 # No hace falta parsear la configuracion, pues tanto "~" como "grupo2" deben ser
 # conocidos programaticamente, ya que la configuracion se halla en ~/grupo2/conf
 
@@ -37,7 +39,7 @@ my @agrupacion;
 
 
 # Refactorizacion 1
-# Llevar este codigo a Util.pm
+# Llevar este codigo a Lib.pm
 # Debe devolver los arrays, salida, estado error/ayuda
 
 # Refactorizacion 2
@@ -181,15 +183,15 @@ if ($error || $ayuda) {
 # fin Refactorizacion 1
 
 
-if (0) {
+if (1) {
     my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
-    Util::imprimir_lista(\%encuestas);
+    Util::imprimir_maestro(\%encuestas);
 
     my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
-    Util::imprimir_lista(\%encuestadores);
+    Util::imprimir_maestro(\%encuestadores);
 
     my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
-    Util::imprimir_lista(\%preguntas);
+    Util::imprimir_maestro(\%preguntas);
 
     #my %suma = Lib::cargar_suma($suma_encuestas);
     #Util::imprimir_lista(\%suma);
