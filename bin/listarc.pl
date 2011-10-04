@@ -8,7 +8,6 @@ use Util;
 use Lib;
 
 
-
 # Los datos que hacen falta de la configuracion son:
 #    ~/grupo2/mae
 #    ~/grupo2/ya/encuestas.sum
@@ -150,7 +149,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 }
 
 if ( $#encuestadores == -1 && $#codigos == -1 && $#numeros == -1 && $#sitios == -1) {
-   $error .= "Debe proveer algún criterio -A -C -N -S\n";
+   $error .= "Debe proveer algún criterio -E -C -N -S\n";
 }
 
 if ( $salida_pantalla == 0 && $salida_archivo == 0) {
@@ -170,11 +169,13 @@ if ($error || $ayuda) {
     if ($salida_archivo) {
        print "Salida a archivo seleccionada\n";
     }
+    if (1) {
     Util::imprimir_argumentos('Encuestadores', @encuestadores);
     Util::imprimir_argumentos('Códigos', @codigos);
     Util::imprimir_argumentos('Números', @numeros);
     Util::imprimir_argumentos('Sitios', @sitios);
     Util::imprimir_argumentos('Agrupacion', @agrupacion);
+    }
 }
 
 # fin Refactorizacion 2
@@ -183,7 +184,7 @@ if ($error || $ayuda) {
 # fin Refactorizacion 1
 
 
-if (1) {
+if (0) {
     my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
     Util::imprimir_maestro(\%encuestas);
 
