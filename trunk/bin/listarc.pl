@@ -17,13 +17,14 @@ use Lib;
 # conocidos programaticamente, ya que la configuracion se halla en ~/grupo2/conf
 
 
-# $raiz="~/grupo2";
-my $raiz="/home/carlos/7508/7508fiuba2011g2/trunk";
+# my $grupo="/home/carlos/7508/7508fiuba2011g2/trunk";
 
-my $suma_encuestas="$raiz/ya/encuestas.sum";
-my $maestro_encuestadores="$raiz/mae/encuestadores.mae";
-my $maestro_encuestas="$raiz/mae/encuestas.mae";
-my $maestro_preguntas="$raiz/mae/preguntas.mae";
+my $grupo=$ENV{GRUPO};
+
+my $suma_encuestas="$grupo/ya/encuestas.sum";
+my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
+my $maestro_encuestas="$grupo/mae/encuestas.mae";
+my $maestro_preguntas="$grupo/mae/preguntas.mae";
 
 
 
@@ -183,20 +184,20 @@ if ($error || $ayuda) {
 
 # fin Refactorizacion 1
 
+my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
+my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
+my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
 
 if (0) {
-    my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
     Util::imprimir_maestro(\%encuestas);
-
-    my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
     Util::imprimir_maestro(\%encuestadores);
-
-    my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
     Util::imprimir_maestro(\%preguntas);
 
     #my %suma = Lib::cargar_suma($suma_encuestas);
     #Util::imprimir_lista(\%suma);
 }
+
+
 
 # encuestador= *                 -E
 # codigo_encuesta= *             -C 
