@@ -55,6 +55,38 @@ my $error           = "";
 #     $error .= "Debe proveer algún argumento\n";
 # }
 
+
+# 0: indice
+# 1: error
+sub procesar($$$$) {
+    my @lista  = $_[0];
+    my @argv   = $_[1];
+    my $indice = $_[2];
+    my $error  = $_[3];
+
+    #my $rlista = \@lista;
+    #my $rargv  = \@argv;
+
+    my $fin_items= 0;
+    while ($$indice < $#ARGV && ! $fin_items) {         # corregir
+        print "indice: $$indice\n";                     # eliminar
+        $$indice++;
+        if ( $ARGV[$$indice] =~ /^-.*/ ) {              # corregir
+            $$indice--;
+            $fin_items = 1;
+            print "proximo\n";                          # eliminar
+        } else {
+            print "push\n";                             # eliminar
+            push(@encuestadores, ($ARGV[$$indice]));    # corregir
+        }
+    }
+    if ( $#encuestadores == -1) {                       # corregir
+        $$error .= "Debe proveer algun elemento para -E\n";
+    }
+
+}
+
+
 while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
     my $elem = $ARGV[$indice];
     if ($elem =~ /-h/) {
@@ -69,19 +101,20 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
         $salida_archivo = 1;
     } elsif ($elem eq '-E' ) {
         # Encuestador
-        my $fin_items= 0;
-        while ($indice < $#ARGV && ! $fin_items) {
-            $indice++;
-            if ( $ARGV[$indice] =~ /^-.*/ ) {
-                $indice--;
-                $fin_items = 1;
-            } else {
-                push(@encuestadores, ($ARGV[$indice])); 
-            }
-        }
-        if ( $#encuestadores == -1) {
-           $error .= "Debe proveer algun elemento para -E\n";
-        }
+        procesar(\@encuestadores, @ARGV, \$indice, \$error);
+#         my $fin_items= 0;
+#         while ($indice < $#ARGV && ! $fin_items) {
+#             $indice++;
+#             if ( $ARGV[$indice] =~ /^-.*/ ) {
+#                 $indice--;
+#                 $fin_items = 1;
+#             } else {
+#                 push(@encuestadores, ($ARGV[$indice])); 
+#             }
+#         }
+#         if ( $#encuestadores == -1) {
+#            $error .= "Debe proveer algun elemento para -E\n";
+#         }
     } elsif ($elem eq '-C' ) {
         # Codigo encuesta
         my $fin_items= 0;
