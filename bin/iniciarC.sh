@@ -1,24 +1,19 @@
 #!/bin/bash
 
-#comando iniciarc.sh
+#Comando: iniciarC.sh
+#Autor: Magnaghi, Pablo
+#Padrón: 88126
 
 #VERIFICO PARAMETROS
 #Si la cantidad de parámetros, exceptuando al cero, es mayor a cero
 #muestro un mensaje de error
 
-if [ $# -gt 0 ] 
-then
+if [ $# -gt 0 ]; then
 	echo "No pueden existir parametros" >&2
 	exit 1
 fi
 
-#HIPOTESIS: No hace falta parsear la configuracion, pues tanto "~" como "grupo2" deben ser
-#conocidos programaticamente, ya que la configuracion se halla en ~/grupo2/conf
-
-#export GRUPO="~/grupo2/"
-
-#ESTO FUE DE PRUEBA, COLOCAR LO NECESARIO PARA HACER PRUEBAS
-export GRUPO="/home/pablo/Escritorio/PRUEBATPSO"
+. setGrupoPablo.sh
 
 #VERIFICO LA EXISTENCIA DEL ARCHIVO DE CONFIGURACION
 
@@ -33,7 +28,8 @@ fi
 
 #Reviso si las variables han sido seteadas anteriormente 
 
-VARIABLES=( CURRDIR CONFDIR DATAMAE LIBDIR BINDIR ARRIDIR DATASIZE LOGDIR LOGEXT MAXLOGSIZE )
+VARIABLES=( CURRDIR CONFDIR DATAMAE LIBDIR BINDIR ARRIDIR DATASIZE LOGDIR LOGEXT MAXLOGSIZE 
+INICIARU INICIARF DETECTARU DETECTARF SUMARU SUMARF LISTARU LISTARF )
 
 for i in "${VARIABLES[@]}";do
 	if [ ! -z ${!i} ]; then
@@ -67,7 +63,7 @@ LISTOS="/listos"
 NOLISTOS="/nolistos"
 YA="/ya"
 
-DIRECTORIOS=( RECHAZADOS PREPARADOS LISTOS NOLISTOS YA ARRIDIR LOGDIR BINDIR )
+DIRECTORIOS=( RECHAZADOS PREPARADOS LISTOS NOLISTOS YA )
 
 for i in "${DIRECTORIOS[@]}";do
 	#echo "DIRECTORIO: $GRUPO${!i}"
@@ -77,7 +73,7 @@ for i in "${DIRECTORIOS[@]}";do
 	fi
 done
 
-DIRECTORIOS=( CONFDIR DATAMAE LIBDIR )
+DIRECTORIOS=( CONFDIR DATAMAE LIBDIR ARRIDIR LOGDIR BINDIR )
 
 for i in "${DIRECTORIOS[@]}";do
 	#echo "DIRECTORIO: ${!i}"
@@ -92,8 +88,10 @@ done
 DETECTAR="detectarC.sh"
 SUMAR="sumarC.sh"
 LISTAR="listarC.pl"
+START="startD.sh"
+STOP="stopD.sh"
 
-ARCHIVOS=( DETECTAR SUMAR LISTAR )
+ARCHIVOS=( DETECTAR SUMAR LISTAR START STOP )
 
 for i in "${ARCHIVOS[@]}";do
 	if [ ! -e ${!i} ]; then
@@ -126,7 +124,6 @@ export INICIADO=1
 #Se realizo el seteo de las variables de ambiente y la verificación 
 #de las condiciones óptimas para la ejecucion
 
-
 #Invocar al script detectarC siempre que detectarC no se esté ejecutando (verificar con ps).
 
 #ps -ef lista todos los procesos actualmente en ejecución
@@ -135,14 +132,24 @@ export INICIADO=1
 
 DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
 
-#verifico si el demonio esta corriendo
+#Verifico si el demonio esta corriendo
 
 if [ -z "$DEMONIO_CORRIENDO" ]; then
-	$DETECTAR &
-	pid=$!
+	bash $START
+	#$START
 	if [ $? -ne 0 ]; then
-		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando $DETECTAR"
+		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
 		exit 1
+	else
+		#Busco el número de pid en el archivo data.txt
+		#Hipotesis: este archivo esta en la carpeta actual si startD.sh
+		#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
+		ARCHIVO_PID="data.txt"
+		if [ ! -r $ARCHIVO_PID ]; then
+			echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el archivo ${ARCHIVO_PID}"
+		else
+			PID=$(cat $ARCHIVO_PID)	
+		fi
 	fi
 else
 	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
@@ -151,19 +158,36 @@ fi
 
 echo "Inicialización de Ambiente Concluida"
 echo "Ambiente"
-echo "CURRDIR=$CURRDIR"
-echo "CONFDIR=$CONFDIR"
-echo "DATAMAE=$DATAMAE"
-echo "LIBDIR=$LIBDIR"
-echo "BINDIR=$BINDIR"
-echo "ARRIDIR=$ARRIDIR"
-echo "DATASIZE=$DATASIZE"
-echo "LOGDIR=$LOGDIR"
-echo "LOGEXT=$LOGEXT"
-echo "MAXLOGSIZE=$MAXLOGSIZE"
-echo "Demonio corriendo bajo el Nro.: <$pid>"
+
+for i in "${VARIABLES[@]}";do
+	echo "$i=${!i}"
+done
+
+echo "Demonio corriendo bajo el Nro.: <$PID>"
 
 exit 0
+
+#-------------ESTA PARTE QUEDA HASTA EL MARTES CUANDO NOS RESPONDAN SI PODEMOS OPTIMIZAR-----------------
+#ps -ef lista todos los procesos actualmente en ejecución
+
+#DEMONIO_CORRIENDO=$(ps -ef | grep "$DETECTAR")
+
+#DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
+
+#verifico si el demonio esta corriendo
+
+#if [ -z "$DEMONIO_CORRIENDO" ]; then
+#	$DETECTAR &
+#	pid=$!
+#	if [ $? -ne 0 ]; then
+#		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando $DETECTAR"
+#		exit 1
+#	fi
+#else
+#	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
+#	exit 1
+#fi
+#--------------------------------------------------------------------------------------------------------
 
 
 
