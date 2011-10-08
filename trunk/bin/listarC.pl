@@ -1,9 +1,22 @@
 #!/usr/bin/perl -w
-
+# 
+# 
+#
+# Autor: Carlos Pantelides 74901
+#
+#
 use strict;
 use warnings;
 
-use lib '../lib';
+# adaptado de http://www.perlmonks.org/index.pl?node_id=162876
+my $libpath; 
+BEGIN {
+  $libpath = $ENV{GRUPO} . "/lib";
+}
+use lib $libpath;
+
+
+use lib $libpath || die("no libpath");;
 use Util;
 use Lib;
 
@@ -13,14 +26,8 @@ use Lib;
 #	~/grupo2/ya/encuestas.sum
 #	~/grupo2/ya/
 #	~/grupo2/lib/ 
-# No hace falta parsear la configuracion, pues tanto "~" como "grupo2" deben ser
-# conocidos programaticamente, ya que la configuracion se halla en ~/grupo2/conf
-
-
-# my $grupo="/home/carlos/7508/7508fiuba2011g2/trunk";
 
 my $grupo=$ENV{GRUPO};
-
 my $suma_encuestas="$grupo/ya/encuestas.sum";
 my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
 my $maestro_encuestas="$grupo/mae/encuestas.mae";
@@ -101,20 +108,22 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		$salida_archivo = 1;
 	} elsif ($elem eq '-E' ) {
 		# Encuestador
-		procesar(\@encuestadores, @ARGV, \$indice, \$error);
-#		 my $fin_items= 0;
-#		 while ($indice < $#ARGV && ! $fin_items) {
-#			 $indice++;
-#			 if ( $ARGV[$indice] =~ /^-.*/ ) {
-#				 $indice--;
-#				 $fin_items = 1;
-#			 } else {
-#				 push(@encuestadores, ($ARGV[$indice])); 
-#			 }
-#		 }
-#		 if ( $#encuestadores == -1) {
-#			$error .= "Debe proveer algun elemento para -E\n";
-#		 }
+
+#		procesar(\@encuestadores, @ARGV, \$indice, \$error);
+
+		 my $fin_items= 0;
+		 while ($indice < $#ARGV && ! $fin_items) {
+			 $indice++;
+			 if ( $ARGV[$indice] =~ /^-.*/ ) {
+				 $indice--;
+				 $fin_items = 1;
+			 } else {
+				 push(@encuestadores, ($ARGV[$indice])); 
+			 }
+		 }
+		 if ( $#encuestadores == -1) {
+			$error .= "Debe proveer algun elemento para -E\n";
+		 }
 	} elsif ($elem eq '-C' ) {
 		# Codigo encuesta
 		my $fin_items= 0;
@@ -203,13 +212,13 @@ if ($error || $ayuda) {
 	if ($salida_archivo) {
 	   print "Salida a archivo seleccionada\n";
 	}
-	if (1) {
+     if (1) {
 	Util::imprimir_argumentos('Encuestadores', @encuestadores);
 	Util::imprimir_argumentos('Códigos', @codigos);
 	Util::imprimir_argumentos('Números', @numeros);
 	Util::imprimir_argumentos('Sitios', @sitios);
 	Util::imprimir_argumentos('Agrupacion', @agrupacion);
-	}
+    }
 }
 
 # fin Refactorizacion 2
@@ -221,13 +230,13 @@ my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
 my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
 my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
 
-if (0) {
-	Util::imprimir_maestro(\%encuestas);
-	Util::imprimir_maestro(\%encuestadores);
-	Util::imprimir_maestro(\%preguntas);
+if (1) {
+Util::imprimir_maestro(\%encuestas);
+Util::imprimir_maestro(\%encuestadores);
+Util::imprimir_maestro(\%preguntas);
 
-	#my %suma = Lib::cargar_suma($suma_encuestas);
-	#Util::imprimir_lista(\%suma);
+#my %suma = Lib::cargar_suma($suma_encuestas);
+#Util::imprimir_lista(\%suma);
 }
 
 
