@@ -28,7 +28,9 @@ use Lib;
 #	~/grupo2/lib/ 
 
 my $grupo=$ENV{GRUPO};
-my $suma_encuestas="$grupo/ya/encuestas.sum";
+my $suma_encuestas=$ENV{ARCHIVO_ENCUESTAS};
+my $directorio_reportes=$ENV{DIRECTORIO_YA};
+
 my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
 my $maestro_encuestas="$grupo/mae/encuestas.mae";
 my $maestro_preguntas="$grupo/mae/preguntas.mae";
@@ -38,11 +40,11 @@ my $maestro_preguntas="$grupo/mae/preguntas.mae";
 my $salida_pantalla = 0;
 my $salida_archivo  = 0;
 
-my @encuestadores;
-my @codigos;
-my @numeros;
-my @sitios;
-my @agrupacion;
+my @criterio_encuestadores;
+my @criterio_codigos;
+my @criterio_numeros;
+my @criterio_sitios;
+my @criterio_agrupacion;
 
 
 # Refactorizacion 1
@@ -84,10 +86,10 @@ sub procesar($$$$) {
 			print "proximo\n";                           # eliminar
 		} else {
 			print "push\n";                               # eliminar
-			push(@encuestadores, ($ARGV[$$indice]));      # corregir
+			push(@lista, ($ARGV[$$indice]));      # corregir
 		}
 	}
-	if ( $#encuestadores == -1) {                                  # corregir
+	if ( $#lista == -1) {                                  # corregir
 		$$error .= "Debe proveer algun elemento para -E\n";
 	}
 
@@ -118,10 +120,10 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 				 $indice--;
 				 $fin_items = 1;
 			 } else {
-				 push(@encuestadores, ($ARGV[$indice])); 
+				 push(@criterio_encuestadores, ($ARGV[$indice])); 
 			 }
 		 }
-		 if ( $#encuestadores == -1) {
+		 if ( $#criterio_encuestadores == -1) {
 			$error .= "Debe proveer algun elemento para -E\n";
 		 }
 	} elsif ($elem eq '-C' ) {
@@ -133,10 +135,10 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 				$indice--;
 				$fin_items = 1;
 			} else {
-				push(@codigos, ($ARGV[$indice])); 
+				push(@criterio_codigos, ($ARGV[$indice])); 
 			}
 		}
-		if ( $#codigos == -1 ) {
+		if ( $#criterio_codigos == -1 ) {
 		   $error .= "Debe proveer algun elemento para -C\n";
 		}
 	} elsif ($elem eq '-N') {
@@ -148,10 +150,10 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 				$indice--;
 				$fin_items = 1;
 			} else {
-				push(@numeros, ($ARGV[$indice])); 
+				push(@criterio_numeros, ($ARGV[$indice])); 
 			}
 		}
-		if ( $#numeros == -1 ) {
+		if ( $#criterio_numeros == -1 ) {
 		   $error .= "Debe proveer algun elemento para -N\n";
 		}
 	} elsif ($elem eq '-S') {
@@ -163,10 +165,10 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 				$indice--;
 				$fin_items = 1;
 			} else {
-				push(@sitios, ($ARGV[$indice])); 
+				push(@criterio_sitios, ($ARGV[$indice])); 
 			}
 		}
-		if ( $#sitios == -1 ) {
+		if ( $#criterio_sitios == -1 ) {
 		   $error .= "Debe proveer algun elemento para -S\n";
 		}
 
@@ -179,10 +181,10 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 				$indice--;
 				$fin_items = 1;
 			} else {
-				push(@agrupacion, ($ARGV[$indice])); 
+				push(@criterio_agrupacion, ($ARGV[$indice])); 
 			}
 		}
-		if ( $#agrupacion == -1 ) {
+		if ( $#criterio_agrupacion == -1 ) {
 		   $error .= "Debe proveer algun elemento para -A\n";
 		}
 	} else {
@@ -191,11 +193,17 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 	$indice++;
 }
 
-if ( $#encuestadores == -1 && $#codigos == -1 && $#numeros == -1 && $#sitios == -1) {
-   $error .= "Debe proveer algún criterio -E -C -N -S\n";
+if ( ! $ayuda 
+	&& (
+		$#criterio_encuestadores == -1 
+		&& $#criterio_codigos == -1 
+		&& $#criterio_numeros == -1 
+		&& $#criterio_sitios == -1) 
+	) {
+	$error .= "Debe proveer algún criterio -E -C -N -S\n";
 }
 
-if ( $salida_pantalla == 0 && $salida_archivo == 0) {
+if ( ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
 	$error .= "Debe proveer un destino -c o -e\n";
 }
 
@@ -205,21 +213,32 @@ if ($error) {
 
 if ($error || $ayuda) {
 	print "Mensaje de ayuda\n";
-} else {
-	if ($salida_pantalla) {
-		print "Salida a pantalla seleccionada\n";
-	} 
-	if ($salida_archivo) {
-	   print "Salida a archivo seleccionada\n";
-	}
-     if (1) {
-	Util::imprimir_argumentos('Encuestadores', @encuestadores);
-	Util::imprimir_argumentos('Códigos', @codigos);
-	Util::imprimir_argumentos('Números', @numeros);
-	Util::imprimir_argumentos('Sitios', @sitios);
-	Util::imprimir_argumentos('Agrupacion', @agrupacion);
-    }
 }
+
+if ($error) {
+	exit 2;
+}
+
+if ($ayuda) {
+	exit 1;
+}
+
+if ($salida_pantalla) {
+	print "Salida a pantalla seleccionada\n";
+} 
+if ($salida_archivo) {
+	print "Salida a archivo seleccionada\n";
+}
+if (1) {
+
+Util::imprimir_criterios('Encuestadores', @criterio_encuestadores);
+Util::imprimir_criterios('Códigos', @criterio_codigos);
+Util::imprimir_criterios('Números', @criterio_numeros);
+Util::imprimir_criterios('Sitios', @criterio_sitios);
+Util::imprimir_criterios('Agrupacion', @criterio_agrupacion);
+
+}
+
 
 # fin Refactorizacion 2
 
@@ -230,15 +249,71 @@ my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
 my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
 my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
 
-if (1) {
+if (0) {
 Util::imprimir_maestro(\%encuestas);
 Util::imprimir_maestro(\%encuestadores);
 Util::imprimir_maestro(\%preguntas);
-
-#my %suma = Lib::cargar_suma($suma_encuestas);
-#Util::imprimir_lista(\%suma);
 }
 
+#normalizar @encuestadores
+#normalizar @codigos
+#normalizar @numeros
+#normalizar @sitios
+
+
+my %lista;
+open(ARCHIVO,$suma_encuestas) || die ("No se pudo cargar $suma_encuestas: $!");
+while (<ARCHIVO>) {
+chomp;
+	my %registro;
+	my $fecha;
+	my $cliente;
+	my $modalidad;
+	my $persona;
+	( 
+		$registro{"encuestador"},
+		$fecha,
+		$registro{"numero"},
+		$registro{"codigo"},
+		$registro{"puntaje"},
+		$cliente,
+		$registro{"sitio"},
+		$modalidad,
+		$persona
+	) = split(/,/);
+
+	#$lista{$registro{"encuestador"}}=\%registro;
+
+# +Encuestador: key de %encuestadores
+# |        +Fecha:NO INTERESA
+# |        |        +Numero: unico local
+# |        |        |    +Codigo encuesta: key de %encuestas
+# |        |        |    |   + Puntaje
+# |        |        |    |   |  +codigo cliente: NO INTERESA
+# |        |        |    |   |  |          +sitio
+# |        |        |    |   |  |          | +modalidad: NO INTERESA
+# |        |        |    |   |  |          | | +persona: NO INTERESA
+# |        |        |    |   |  |          | | |
+#ESTEPANO,20110909,1022,E03,12,30354444882,E,P,II
+
+
+	#controlar que $registro cumpla el criterio
+	if ( Lib::evaluar_encuestador($registro{"encuestador"}, @criterio_encuestadores, %encuestadores) ) {
+		#controlar que $registro se encuentre dento de %codigos
+		if ( Lib::evaluar_codigo($registro{"codigo"}, @criterio_codigos, %encuestas) ) {
+			#controlar que $registro se encuentre dento de %numeros
+			if ( Lib::evaluar_numero($registro{"numero"}, @criterio_numeros) ) {
+				#controlar que $registro se encuentre dento de @sitios
+				if ( Lib::evaluar_sitio($registro{"sitio"}, @criterio_sitios) ) {
+					#procesar registro y almacernar segun @agrupacion
+					Util::imprimir_hash( %registro );
+				}
+			}
+		}
+	}
+	
+}
+close(ARCHIVO);
 
 
 # encuestador= *				 -E
