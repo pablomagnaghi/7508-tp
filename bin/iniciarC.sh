@@ -13,7 +13,8 @@ if [ $# -gt 0 ]; then
 	exit 1
 fi
 
-. setGrupoPablo.sh
+#Para uso del autor la línea 17, luego debe borrarse para integración
+. setGrupoPablo.sh 
 
 #VERIFICO LA EXISTENCIA DEL ARCHIVO DE CONFIGURACION
 
@@ -73,6 +74,19 @@ for i in "${DIRECTORIOS[@]}";do
 	fi
 done
 
+ENCUESTAS_SUM="/encuestas.sum"
+ESCUESTAS_RECH="/encuestas.rech"
+
+ARCHIVOS=( ENCUESTAS_SUM ESCUESTAS_RECH )
+
+for i in "${ARCHIVOS[@]}";do
+	if [ ! -r $GRUPO$YA${!i} -o ! -w $GRUPO$YA${!i} ]; then
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo $GRUPO$YA${!i} o no tiene permisos de lectura y/o escritura"
+		exit 1
+	fi
+done
+
+
 DIRECTORIOS=( CONFDIR DATAMAE LIBDIR ARRIDIR LOGDIR BINDIR )
 
 for i in "${DIRECTORIOS[@]}";do
@@ -94,9 +108,9 @@ STOP="stopD.sh"
 ARCHIVOS=( DETECTAR SUMAR LISTAR START STOP )
 
 for i in "${ARCHIVOS[@]}";do
-	if [ ! -e ${!i} ]; then
-	echo "Inicialización de ambiente no fue exitosa. No existe archivo ${!i}"
-	exit 1
+	if [ ! -x ${!i} ]; then
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo ${!i} o no tiene permiso de ejecución"
+		exit 1
 	fi
 done
 
@@ -110,8 +124,8 @@ ARCHIVOS=( ENCUESTAS PREGUNTAS ENCUESTADORES )
 
 for i in "${ARCHIVOS[@]}";do
 	if [ ! -r $DATAMAE${!i} ]; then
-	echo "Inicialización de ambiente no fue exitosa. No existe archivo $DATAMAE${!i}"
-	exit 1
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo $DATAMAE${!i} o no tiene permiso de lectura"
+		exit 1
 	fi
 done
 
@@ -135,8 +149,7 @@ DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
 #Verifico si el demonio esta corriendo
 
 if [ -z "$DEMONIO_CORRIENDO" ]; then
-	bash $START
-	#$START
+	./$START
 	if [ $? -ne 0 ]; then
 		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
 		exit 1
@@ -146,7 +159,8 @@ if [ -z "$DEMONIO_CORRIENDO" ]; then
 		#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
 		ARCHIVO_PID="data.txt"
 		if [ ! -r $ARCHIVO_PID ]; then
-			echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el archivo ${ARCHIVO_PID}"
+			echo "Inicialización de ambiente no fue exitosa. No existe archivo ${ARCHIVO_PID} o no tiene permiso de lectura"
+			exit 1
 		else
 			PID=$(cat $ARCHIVO_PID)	
 		fi
@@ -155,6 +169,9 @@ else
 	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
 	exit 1
 fi
+
+export ARCHIVO_ENCUESTAS=$GRUPO$YA$ENCUESTAS_SUM
+export DIRECTORIO_YA=$GRUPO$YA
 
 echo "Inicialización de Ambiente Concluida"
 echo "Ambiente"
@@ -166,6 +183,7 @@ done
 echo "Demonio corriendo bajo el Nro.: <$PID>"
 
 exit 0
+
 
 #-------------ESTA PARTE QUEDA HASTA EL MARTES CUANDO NOS RESPONDAN SI PODEMOS OPTIMIZAR-----------------
 #ps -ef lista todos los procesos actualmente en ejecución
@@ -187,15 +205,4 @@ exit 0
 #	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
 #	exit 1
 #fi
-#--------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
 
