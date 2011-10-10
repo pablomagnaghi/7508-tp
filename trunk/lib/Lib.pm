@@ -8,7 +8,7 @@
 
 
 
-use strict;
+#use strict;
 use warnings;
 
 package Lib;
@@ -117,15 +117,17 @@ sub cargar_encuestas($) {
 
 
 sub mostrar_ficha {
-	my ($out,$numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color) = @_;
-	print $out "Encuesta Nro: $numero realizada por $usuario el dia $fecha\n";
-	print $out "\n";
-	print $out "Cliente $cliente, Modalidad $modalidad, Sitio $sitio y Persona $persona\n";
-	print $out "\n";
-	print $out "Encuesta aplicada $encuesta compuesta por $preguntas preguntas\n";
-	print $out "\n";
-	print $out "Puntaje obtenido: $puntaje calificación: $color\n";
-	print $out "--------------------------------------------------------------------------------\n";
+	my ($numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color,@salidas) = @_;
+	foreach my $OUT (@salidas) {
+		print $OUT "Encuesta Nro: $numero realizada por $usuario el dia $fecha\n";
+		print $OUT "\n";
+		print $OUT "Cliente $cliente, Modalidad $modalidad, Sitio $sitio y Persona $persona\n";
+		print $OUT "\n";
+		print $OUT "Encuesta aplicada $encuesta compuesta por $preguntas preguntas\n";
+		print $OUT "\n";
+		print $OUT "Puntaje obtenido: $puntaje calificación: $color\n";
+		print $OUT "--------------------------------------------------------------------------------\n";
+	}
 }
 
 #
