@@ -115,6 +115,19 @@ sub cargar_encuestas($) {
 	return (%lista);
 }
 
+
+sub mostrar_ficha {
+	my ($out,$numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color) = @_;
+	print $out "Encuesta Nro: $numero realizada por $usuario el dia $fecha\n";
+	print $out "\n";
+	print $out "Cliente $cliente, Modalidad $modalidad, Sitio $sitio y Persona $persona\n";
+	print $out "\n";
+	print $out "Encuesta aplicada $encuesta compuesta por $preguntas preguntas\n";
+	print $out "\n";
+	print $out "Puntaje obtenido: $puntaje calificación: $color\n";
+	print $out "--------------------------------------------------------------------------------\n";
+}
+
 #
 # Uso: cargar_encuestadores(archivo) 
 # 
@@ -186,6 +199,25 @@ sub cargar_preguntas($){
 	}
 	close(ARCHIVO);
 	return (%lista);
+}
+
+sub mostrar_ayuda {
+	print STDERR "Modo de uso:\n";
+	print STDERR "  listarC.pl salida [filtrado] [agrupacion] \n";
+	print STDERR "  Selección de salida\n";
+	print STDERR "    Pantalla: -c\n";
+	print STDERR "    Archivo:  -e\n";
+	print STDERR "  Criterios de filtrado\n";
+	print STDERR "    Identificador encuestador: -E encuesta+\n";
+	print STDERR "    Número de encuesta:        -N numero [numero]\n";
+	print STDERR "    Código de encuesta:        -C codigo+\n";
+	print STDERR "    Sitio de encuesta:         -S sitio+\n";
+	print STDERR "  Criterios de agrupación\n";
+	print STDERR "    -A [e n c s]+\n";
+	print STDERR "\n";
+
+
+
 }
 
 # sub cargar_suma {
