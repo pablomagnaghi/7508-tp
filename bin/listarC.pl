@@ -143,6 +143,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		}
 	} elsif ($elem eq '-N') {
 		# Numero de encuesta
+		# @TODO: uno o dos numeros
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
@@ -193,16 +194,16 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 	$indice++;
 }
 
-if ( ! $ayuda 
-	&& (
-		$#criterio_encuestadores == -1 
-		&& $#criterio_codigos == -1 
-		&& $#criterio_numeros == -1 
-		&& $#criterio_sitios == -1) 
-	) {
-	$error .= "Debe proveer algún criterio -E -C -N -S\n";
-}
-
+# if ( ! $ayuda 
+# 	&& (
+# 		$criterio_encuestadores == -1 
+# 		&& $#criterio_codigos == -1 
+# 		&& $#criterio_numeros == -1 
+# 		&& $#criterio_sitios == -1) 
+# 	) {
+# 	$error .= "Debe proveer algún criterio -E -C -N -S\n";
+# }
+# 
 if ( ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
 	$error .= "Debe proveer un destino -c o -e\n";
 }
@@ -245,20 +246,15 @@ Util::imprimir_criterios('Agrupacion', @criterio_agrupacion);
 
 # fin Refactorizacion 1
 
-my %encuestas = Lib::cargar_encuestas($maestro_encuestas);
+my %encuestas     = Lib::cargar_encuestas($maestro_encuestas);
 my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
-my %preguntas = Lib::cargar_preguntas($maestro_preguntas);
+my %preguntas     = Lib::cargar_preguntas($maestro_preguntas);
 
 if (0) {
 Util::imprimir_maestro(\%encuestas);
 Util::imprimir_maestro(\%encuestadores);
 Util::imprimir_maestro(\%preguntas);
 }
-
-#normalizar @encuestadores
-#normalizar @codigos
-#normalizar @numeros
-#normalizar @sitios
 
 
 my %lista;
@@ -296,30 +292,73 @@ chomp;
 # |        |        |    |   |  |          | | |
 #ESTEPANO,20110909,1022,E03,12,30354444882,E,P,II
 
+	my $cumple_encuestadores = 0;
+	my $cumple_numeros = 0;
+	my $cumple_sitios = 0;
+	my $cumple_codigos = 0;
 
-	#controlar que $registro cumpla el criterio
-	if ( Lib::evaluar_encuestador($registro{"encuestador"}, @criterio_encuestadores, %encuestadores) ) {
-		#controlar que $registro se encuentre dento de %codigos
-		if ( Lib::evaluar_codigo($registro{"codigo"}, @criterio_codigos, %encuestas) ) {
-			#controlar que $registro se encuentre dento de %numeros
-			if ( Lib::evaluar_numero($registro{"numero"}, @criterio_numeros) ) {
-				#controlar que $registro se encuentre dento de @sitios
-				if ( Lib::evaluar_sitio($registro{"sitio"}, @criterio_sitios) ) {
-					#procesar registro y almacernar segun @agrupacion
-					Util::imprimir_hash( %registro );
-				}
+	if( @criterio_encuestadores == 0 ) {
+		$cumple_encuestadores = 1;
+	} else {
+		foreach (@criterio_encuestadores) {
+			if ($registro{'encuestador'} =~ $_ ) {  # @TODO: USAR ANCHORS
+				$cumple_encuestadores = 1;
+				last;
 			}
 		}
+	}
+
+	if( @criterio_sitios == 0 ) {
+		$cumple_sitios = 1;
+	} else {
+		foreach (@criterio_encuestadores) {
+			if ($registro{'sitio'} =~ $_ ) { # @TODO: USAR ANCHORS
+				$cumple_sitios = 1;
+				last;
+			}
+		}
+	}
+
+	if( @criterio_codigos == 0 ) {
+		$cumple_codigos = 1;
+	} else {
+		foreach (@criterio_codigos) {
+			if ($registro{'codigo'} =~ $_ ) { # @TODO: USAR ANCHORS
+				$cumple_sitios = 1;
+				last;
+			}
+		}
+	}
+
+	if( @criterio_numeros == 0 ) {
+		$cumple_numeros = 1;
+	} elsif ( @criterio_numeros == 0 ) {
+		if ($registro{'numero'} =~ $criterio_numeros[0] ) { # @TODO: USAR ANCHORS
+			$cumple_numeros = 1;
+		}
+	} else {
+		if ( $registro{'numero'} >= $criterio_numeros[0] && $registro{'numero'} <= $criterio_numeros[1]) {
+			$cumple_numeros = 1;
+		}
+	}
+
+	#controlar que $registro cumpla el criterio
+	if ( $cumple_encuestadores
+		&& $cumple_numeros
+		&& $cumple_sitios
+		&& $cumple_codigos
+	) {
+		Util::imprimir_hash( %registro );
 	}
 	
 }
 close(ARCHIVO);
 
 
-# encuestador= *				 -E
-# codigo_encuesta= *			 -C 
-# numero_encuesta=1, rango, *	-N
-# sitio_encuensta= *			 -S
+
+
+
+
 # 
 # -c 
 # -e
