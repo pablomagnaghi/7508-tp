@@ -11,11 +11,11 @@
 # 3: salida no especificada
 # 4: criterio vacio
 # 5: falla lectura archivo
+# 6: variables de entorno no definidas
 
 # Suposiciones:
 # encuestas.sum esta bien formado y es válido
-# 
- 
+#
 
 use strict;
 use warnings;
@@ -23,18 +23,25 @@ use warnings;
 # adaptado de http://www.perlmonks.org/index.pl?node_id=162876
 my $libpath; 
 BEGIN {
-  $libpath = $ENV{GRUPO} . "/lib";
+	if (!defined( $ENV{'GRUPO'}) ) {
+		print STDERR "Variables de entorno GRUPO no definida\n";
+		exit 6;
+	}
+	$libpath = $ENV{'GRUPO'} . "/lib";
 }
 
 use lib $libpath || die("no libpath");;
 use Util;
 use Lib;
 
-my $grupo=$ENV{GRUPO};
-my $suma_encuestas=$ENV{ARCHIVO_ENCUESTAS};
-my $directorio_reportes=$ENV{DIRECTORIO_YA};
+if (!defined($ENV{'ARCHIVO_ENCUESTAS'} ) ||!defined( $ENV{'DIRECTORIO_YA'}) ) {
+	Util::dieWithCode("Variables de entorno no definidas\n", 6);
+}
 
-# @todo: controlar variables de entorno
+my $grupo=$ENV{'GRUPO'};
+my $suma_encuestas=$ENV{'ARCHIVO_ENCUESTAS'};
+my $directorio_reportes=$ENV{'DIRECTORIO_YA'};
+
 
 my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
 my $maestro_encuestas="$grupo/mae/encuestas.mae";
@@ -43,6 +50,7 @@ my $maestro_preguntas="$grupo/mae/preguntas.mae";
 my $salida_pantalla = 0;
 my $salida_archivo  = 0;
 my $salida_ficha    = 0;
+my @salidas;
 
 my @criterio_encuestadores;
 my @criterio_codigos;
@@ -61,7 +69,7 @@ my @criterio_agrupacion;
 my $indice  = 0;
 
 my $ayuda   = 0;
-my $error   = "";
+my $error   = '';
 my $exit    = 0;
 
 while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
@@ -193,19 +201,8 @@ if ($salida_pantalla) {
 if ($salida_archivo) {
 	print STDERR "Salida a archivo seleccionada\n";
 }
-if (1) {
-
-Util::imprimir_criterios('Encuestadores', @criterio_encuestadores);
-Util::imprimir_criterios('Códigos', @criterio_codigos);
-Util::imprimir_criterios('Números', @criterio_numeros);
-Util::imprimir_criterios('Sitios', @criterio_sitios);
-Util::imprimir_criterios('Agrupacion', @criterio_agrupacion);
-
-}
-
 
 # fin Refactorizacion 2
-
 
 # fin Refactorizacion 1
 
@@ -213,16 +210,33 @@ my %encuestas     = Lib::cargar_encuestas($maestro_encuestas);
 my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
 my %preguntas     = Lib::cargar_preguntas($maestro_preguntas);
 
-if (0) {
-Util::imprimir_maestro(\%encuestas);
-Util::imprimir_maestro(\%encuestadores);
-Util::imprimir_maestro(\%preguntas);
-}
-
-
+# Esto debe ser reemplazado por la estructura de agrupacion
 my $rojo = 0;
 my $amarillo = 0;
 my $verde = 0;
+
+
+# Manejo de reporte
+if ($salida_pantalla) {
+	push(@salidas, *STDOUT);
+} 
+
+if ($salida_archivo) {
+	my $nombre_reporte = "$directorio_reportes/reporte." . time() . '.txt';
+	open(REPORTE,'>', $nombre_reporte );
+	# si no se puede abrir el archivo de reporte pero la salida por pantalla
+	# esta habilitada, seguimos. Si no, fallamos.
+	if (! *REPORTE ) {
+		if (! $salida_pantalla) {
+			dieWithCode("No se pudo abrir archivo de reporte $!", 6);
+		} else {
+			print STDERR "No se pudo abrir archivo de reporte $!";
+		}
+	} else {
+		print STDERR "Reporte en $nombre_reporte\n";
+		push(@salidas, *REPORTE);
+	}
+}
 
 my %lista;
 open(ARCHIVO,$suma_encuestas) || Util::dieWithCode("No se pudo cargar $suma_encuestas: $!", 5);
@@ -269,7 +283,8 @@ chomp;
 		$cumple_encuestadores = 1;
 	} else {
 		foreach (@criterio_encuestadores) {
-			if ($registro{'encuestador'} =~ $_ ) {  # @TODO: USAR ANCHORS
+			my $pattern= '^' . $_ . '$';                  #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'encuestador'} =~ $pattern ) {  #@todo: que soporte comodines en lugar de regexps
 				$cumple_encuestadores = 1;
 				last;
 			}
@@ -280,7 +295,8 @@ chomp;
 		$cumple_sitios = 1;
 	} else {
 		foreach (@criterio_sitios) {
-			if ($registro{'sitio'} =~ $_ ) { # @TODO: USAR ANCHORS
+			my $pattern= '^' . $_ . '$';            #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'sitio'} =~ $pattern ) {  #@todo: que soporte comodines en lugar de regexps
 				$cumple_sitios = 1;
 				last;
 			}
@@ -291,8 +307,9 @@ chomp;
 		$cumple_codigos = 1;
 	} else {
 		foreach (@criterio_codigos) {
-			if ($registro{'codigo'} =~ $_ ) { # @TODO: USAR ANCHORS
-				$cumple_sitios = 1;
+			my $pattern= '^' . $_ . '$';            #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'codigo'} =~ $pattern ) { #@todo: que soporte comodines en lugar de regexps
+				$cumple_codigos = 1;
 				last;
 			}
 		}
@@ -300,17 +317,16 @@ chomp;
 
 	if( @criterio_numeros == 0 ) {
 		$cumple_numeros = 1;
-	} elsif ( @criterio_numeros == 0 ) {
-		if ($registro{'numero'} =~ $criterio_numeros[0] ) { # @TODO: USAR ANCHORS
+	} elsif ( @criterio_numeros == 1 ) {
+		if ($registro{'numero'} =~ $criterio_numeros[0] ) { 
 			$cumple_numeros = 1;
 		}
 	} else {
+		#@todo controlar que sean numeros
 		if ( $registro{'numero'} >= $criterio_numeros[0] && $registro{'numero'} <= $criterio_numeros[1]) {
 			$cumple_numeros = 1;
 		}
 	}
-
-
 
 	#controlar que $registro cumpla el criterio
 	if ( $cumple_encuestadores
@@ -320,19 +336,25 @@ chomp;
 	) {
 		my $color;
 		if ( $registro{'puntaje'} <= $encuestas{$registro{'codigo'}}{'rojo_fin'} ) {
-			$rojo++;
 			$color = 'rojo';
 		} elsif ( $registro{'puntaje'} >= $encuestas{$registro{'codigo'}}{'verde_inicio'} ) {
-			$verde++;
 			$color = 'verde';
 		} else {
-			$amarillo++;
 			$color = 'amarillo';
 		}
 
+		# @todo: logica de agrupamiento
+		if ($color eq 'rojo') {
+			$rojo++;
+		} elsif ($color eq 'verde') {
+			$verde++;
+		} else {
+			$amarillo++;
+		}
+
+
 		if ($salida_ficha) {
 			Lib::mostrar_ficha(
-				*STDERR,
 				$registro{'numero'},
 				$registro{'encuestador'} . ' ' .$encuestadores{$registro{'encuestador'}}{'nombre'},
 				$registro{'fecha'},
@@ -343,7 +365,8 @@ chomp;
 				$registro{'codigo'} . ' ' . $encuestas{$registro{'codigo'}}{'nombre'},
 				$encuestas{$registro{'codigo'}}{'cantidad'},
 				$registro{'puntaje'},
-				$color
+				$color,
+				@salidas
 			);
 		}
 		print STDERR $registro{'puntaje'} . " corresponde a $color\n";
@@ -352,7 +375,25 @@ chomp;
 }
 close(ARCHIVO);
 
+# @todo: mostrar resultados
 
-# mostrar resultados
+if (*REPORTE) {
+	close(REPORTE);
+}
 
 
+if (0) {
+
+Util::imprimir_criterios('Encuestadores', @criterio_encuestadores);
+Util::imprimir_criterios('Códigos', @criterio_codigos);
+Util::imprimir_criterios('Números', @criterio_numeros);
+Util::imprimir_criterios('Sitios', @criterio_sitios);
+Util::imprimir_criterios('Agrupacion', @criterio_agrupacion);
+
+}
+
+if (0) {
+Util::imprimir_maestro(\%encuestas);
+Util::imprimir_maestro(\%encuestadores);
+Util::imprimir_maestro(\%preguntas);
+}
