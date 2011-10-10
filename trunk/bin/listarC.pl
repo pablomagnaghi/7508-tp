@@ -4,7 +4,15 @@
 #
 # Autor: Carlos Pantelides 74901
 #
-#
+# valores de exit:
+# 0: ejecucion exitosa
+# 1: ayuda
+# 2: argumento desconocido
+# 3: salida no especificada
+# 4: criterio vacio
+# 5: falla lectura archivo
+
+
 use strict;
 use warnings;
 
@@ -31,6 +39,8 @@ my $grupo=$ENV{GRUPO};
 my $suma_encuestas=$ENV{ARCHIVO_ENCUESTAS};
 my $directorio_reportes=$ENV{DIRECTORIO_YA};
 
+# controlar variables de entorno
+
 my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
 my $maestro_encuestas="$grupo/mae/encuestas.mae";
 my $maestro_preguntas="$grupo/mae/preguntas.mae";
@@ -54,47 +64,15 @@ my @criterio_agrupacion;
 # Refactorizacion 2
 # Mover a una funcion el codigo duplicado de -E -S -M -C -A
 
-my $indice		  = 0;
+my $indice  = 0;
 
-my $ayuda		   = 0;
-my $error		   = "";
-
+my $ayuda   = 0;
+my $error   = "";
+my $exit    = 0;
 
 # if ($#ARGV == -1 ) {
 #	 $error .= "Debe proveer algún argumento\n";
 # }
-
-
-# 0: indice
-# 1: error
-sub procesar($$$$) {
-	my @lista  = $_[0];
-	my @argv   = $_[1];
-	my $indice = $_[2];
-	my $error  = $_[3];
-
-	#my $rlista = \@lista;
-	#my $rargv  = \@argv;
-
-	my $fin_items= 0;
-	while ($$indice < $#ARGV && ! $fin_items) {                  # corregir
-		print "indice: $$indice\n";                          # eliminar
-		$$indice++;
-		if ( $ARGV[$$indice] =~ /^-.*/ ) {                   # corregir
-			$$indice--;
-			$fin_items = 1;
-			print "proximo\n";                           # eliminar
-		} else {
-			print "push\n";                               # eliminar
-			push(@lista, ($ARGV[$$indice]));      # corregir
-		}
-	}
-	if ( $#lista == -1) {                                  # corregir
-		$$error .= "Debe proveer algun elemento para -E\n";
-	}
-
-}
-
 
 while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 	my $elem = $ARGV[$indice];
@@ -103,29 +81,26 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		$ayuda = 1;
 	} elsif ($elem eq '-c' ) {
 		# Consulta a pantalla
-
 		$salida_pantalla = 1;
 	} elsif ($elem eq '-e' ) {
 		# Consulta a archivo
 		$salida_archivo = 1;
 	} elsif ($elem eq '-E' ) {
 		# Encuestador
-
-#		procesar(\@encuestadores, @ARGV, \$indice, \$error);
-
 		 my $fin_items= 0;
 		 while ($indice < $#ARGV && ! $fin_items) {
-			 $indice++;
-			 if ( $ARGV[$indice] =~ /^-.*/ ) {
-				 $indice--;
-				 $fin_items = 1;
-			 } else {
+			$indice++;
+			if ( $ARGV[$indice] =~ /^-.*/ ) {
+				$indice--;
+				$fin_items = 1;
+			} else {
 				 push(@criterio_encuestadores, ($ARGV[$indice])); 
-			 }
-		 }
-		 if ( $#criterio_encuestadores == -1) {
+			}
+		}
+		if ( $#criterio_encuestadores == -1) {
 			$error .= "Debe proveer algun elemento para -E\n";
-		 }
+			$exit = 4;
+		}
 	} elsif ($elem eq '-C' ) {
 		# Codigo encuesta
 		my $fin_items= 0;
@@ -139,7 +114,8 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			}
 		}
 		if ( $#criterio_codigos == -1 ) {
-		   $error .= "Debe proveer algun elemento para -C\n";
+			$error .= "Debe proveer algun elemento para -C\n";
+			$exit = 4;
 		}
 	} elsif ($elem eq '-N') {
 		# Numero de encuesta
@@ -155,7 +131,8 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			}
 		}
 		if ( $#criterio_numeros == -1 ) {
-		   $error .= "Debe proveer algun elemento para -N\n";
+			$error .= "Debe proveer algun elemento para -N\n";
+			$exit = 4;
 		}
 	} elsif ($elem eq '-S') {
 		# Sitio de encuesta
@@ -170,7 +147,8 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			}
 		}
 		if ( $#criterio_sitios == -1 ) {
-		   $error .= "Debe proveer algun elemento para -S\n";
+			$error .= "Debe proveer algun elemento para -S\n";
+			$exit = 4;
 		}
 
 	} elsif ($elem eq '-A') {
@@ -186,10 +164,12 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			}
 		}
 		if ( $#criterio_agrupacion == -1 ) {
-		   $error .= "Debe proveer algun elemento para -A\n";
+			$error .= "Debe proveer algun elemento para -A\n";
+			$exit = 4;
 		}
 	} else {
 		$error .= "Argumento desconocido $elem\n";
+		$exit = 2;
 	}
 	$indice++;
 }
@@ -204,8 +184,9 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 # 	$error .= "Debe proveer algún criterio -E -C -N -S\n";
 # }
 # 
-if ( ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
+if ( ! $exit && ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
 	$error .= "Debe proveer un destino -c o -e\n";
+	$exit = 3;
 }
 
 if ($error) {
@@ -213,11 +194,11 @@ if ($error) {
 }
 
 if ($error || $ayuda) {
-	print "Mensaje de ayuda\n";
+	print STDERR "Mensaje de ayuda\n";
 }
 
 if ($error) {
-	exit 2;
+	exit $exit;
 }
 
 if ($ayuda) {
@@ -257,8 +238,12 @@ Util::imprimir_maestro(\%preguntas);
 }
 
 
+my $rojo = 0;
+my $amarillo = 0;
+my $verde = 0;
+
 my %lista;
-open(ARCHIVO,$suma_encuestas) || die ("No se pudo cargar $suma_encuestas: $!");
+open(ARCHIVO,$suma_encuestas) || Util::dieWithCode("No se pudo cargar $suma_encuestas: $!", 5);
 while (<ARCHIVO>) {
 chomp;
 	my %registro;
@@ -311,7 +296,7 @@ chomp;
 	if( @criterio_sitios == 0 ) {
 		$cumple_sitios = 1;
 	} else {
-		foreach (@criterio_encuestadores) {
+		foreach (@criterio_sitios) {
 			if ($registro{'sitio'} =~ $_ ) { # @TODO: USAR ANCHORS
 				$cumple_sitios = 1;
 				last;
@@ -348,7 +333,24 @@ chomp;
 		&& $cumple_sitios
 		&& $cumple_codigos
 	) {
-		Util::imprimir_hash( %registro );
+		#Util::imprimir_hash( %registro );
+		#para cada encuesta,
+		#ver segun codigo de encuesta en encuestas.mae
+		#el puntaje a que le corresponde su puntaje
+		#e incrementar el color
+		#luego tener en cuenta la agrupacion
+		#my %encuesta = $encuestas{$registro{'codigo'}};
+		if ( $registro{"puntaje"} <= $encuestas{$registro{'codigo'}}{'rojo_fin'} ) {
+			$rojo++;
+			print STDERR $registro{"puntaje"} . " corresponde a ROJO\n";
+		} elsif ( $registro{"puntaje"} >= $encuestas{$registro{'codigo'}}{'verde_inicio'} ) {
+			$verde++;
+			print STDERR $registro{"puntaje"} . " corresponde a VERDE\n";
+		} else {
+			$amarillo++;
+			print STDERR $registro{"puntaje"} . " corresponde a AMARILLO\n";
+		}
+		
 	}
 	
 }
