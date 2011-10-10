@@ -209,7 +209,7 @@ if ( ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
 }
 
 if ($error) {
-	print "Error: $error\n";
+	print STDERR "Error: $error\n";
 }
 
 if ($error || $ayuda) {
@@ -225,10 +225,10 @@ if ($ayuda) {
 }
 
 if ($salida_pantalla) {
-	print "Salida a pantalla seleccionada\n";
+	print STDERR "Salida a pantalla seleccionada\n";
 } 
 if ($salida_archivo) {
-	print "Salida a archivo seleccionada\n";
+	print STDERR "Salida a archivo seleccionada\n";
 }
 if (1) {
 
