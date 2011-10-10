@@ -40,17 +40,17 @@ sub hash_walk($$$) {
 	}
 }
 
-sub print_keys_and_value($$$$) {
+sub print_keys_and_value() {
 	my ($k, $v, $key_list) = @_;
-	printf "k = %-8s  v = %-4s  key_list = [%s]\n", $k, $v, "@$key_list";
+	printf STDERR "k = %-8s  v = %-4s  key_list = [%s]\n", $k, $v, "@$key_list";
 }
 
 sub imprimir_criterios($@) {
 	my ($nombre, @lista) = @_;
 	if ($#lista != -1) {
-		print "$nombre\n";
+		print STDERR "$nombre\n";
 		foreach my $item (@lista) {
-			print "	$item\n";
+			print STDERR "	$item\n";
 		}
 	}
 }
@@ -60,7 +60,7 @@ sub imprimir_hash(%) {
 	my $clave;
 	my $valor;
 	while (($clave,$valor) = each(%lista)) {
-		print "$clave => $valor \n";
+		print STDERR "$clave => $valor \n";
 	}
 }
 
@@ -69,7 +69,7 @@ sub imprimir_maestro(@) {
 	my($lista) = @_;
 	while (my ($k1,$v1) = each %$lista) {
 		while (my ($k2, $v2) = each %$v1) {
-		  print "$k1 $k2 = $v2\n";
+		  print STDERR "$k1 $k2 = $v2\n";
 		}
 	}
 
