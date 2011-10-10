@@ -1,5 +1,10 @@
 #!/usr/bin/perl -w
-
+# 
+# Funciones auxiliares
+#
+# Autor: Carlos Pantelides 74901
+#
+#
 use strict;
 use warnings;
 
@@ -11,8 +16,9 @@ our @EXPORT = qw(
 	imprimir_maestro
 	imprimir_argumentos
 );
+sub hash_walk($$$);
 
-sub hash_walk {
+sub hash_walk($$$) {
 	my ($hash, $key_list, $callback) = @_;
 	while (my ($k, $v) = each %$hash) {
 		# Keep track of the hierarchy of keys, in case
@@ -34,12 +40,12 @@ sub hash_walk {
 	}
 }
 
-sub print_keys_and_value {
+sub print_keys_and_value($$$$) {
 	my ($k, $v, $key_list) = @_;
 	printf "k = %-8s  v = %-4s  key_list = [%s]\n", $k, $v, "@$key_list";
 }
 
-sub imprimir_argumentos {
+sub imprimir_criterios($@) {
 	my ($nombre, @lista) = @_;
 	if ($#lista != -1) {
 		print "$nombre\n";
@@ -49,7 +55,17 @@ sub imprimir_argumentos {
 	}
 }
 
-sub imprimir_maestro {
+sub imprimir_hash(%) {
+	my (%lista) = @_;
+	my $clave;
+	my $valor;
+	while (($clave,$valor) = each(%lista)) {
+		print "$clave => $valor \n";
+	}
+}
+
+
+sub imprimir_maestro(@) {
 	my($lista) = @_;
 	while (my ($k1,$v1) = each %$lista) {
 		while (my ($k2, $v2) = each %$v1) {
