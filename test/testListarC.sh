@@ -36,32 +36,32 @@ testSalida() {
 }
 
 testExitArgumentoDesconocido() {
-	$RUN -f  > /dev/null 2>&1
+	$RUN -x  > /dev/null 2>&1
 	exit=$?
-	assertEquals "Mal exit status -f" 2 $exit
+	assertEquals "Mal exit status -x" 2 $exit
 
-	$RUN -f -E 1 > /dev/null 2>&1
+	$RUN -x -E 1 > /dev/null 2>&1
 	exit=$?
-	assertEquals "Mal exit status -f -E 1" 2 $exit
+	assertEquals "Mal exit status -x -E 1" 2 $exit
 
-	$RUN -E 1 -f  > /dev/null 2>&1
+	$RUN -E 1 -x  > /dev/null 2>&1
 	exit=$?
-	assertEquals "Mal exit status -E 1 -f" 2 $exit
+	assertEquals "Mal exit status -E 1 -x" 2 $exit
 }
 
 
 testOutputArgumentoDesconocido() {
-	$RUN -f 2>&1 | grep -q -e "Argumento desconocido"
+	$RUN -x 2>&1 | grep -q -e "Argumento desconocido"
 	exit=$?
-	assertEquals "-f Argumento desconocido no detectado" 0 $exit
+	assertEquals "-x Argumento desconocido no detectado" 0 $exit
 
-	$RUN -E 1 -f 2>&1 | grep -q -e "Argumento desconocido"
+	$RUN -E 1 -x 2>&1 | grep -q -e "Argumento desconocido"
 	exit=$?
-	assertEquals "-E 1 -f Argumento desconocido no detectado" 0 $exit
+	assertEquals "-E 1 -x Argumento desconocido no detectado" 0 $exit
 
-	$RUN -f -E 1 2>&1 | grep -q -e "Argumento desconocido"
+	$RUN -x -E 1 2>&1 | grep -q -e "Argumento desconocido"
 	exit=$?
-	assertEquals "-f -E 1 Argumento desconocido no detectado" 0 $exit
+	assertEquals "-x -E 1 Argumento desconocido no detectado" 0 $exit
 }
 
 testExitCriteriosVacios() {

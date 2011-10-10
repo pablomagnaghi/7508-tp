@@ -12,6 +12,10 @@
 # 4: criterio vacio
 # 5: falla lectura archivo
 
+# Suposiciones:
+# encuestas.sum esta bien formado y es válido
+# 
+ 
 
 use strict;
 use warnings;
@@ -21,34 +25,24 @@ my $libpath;
 BEGIN {
   $libpath = $ENV{GRUPO} . "/lib";
 }
-use lib $libpath;
-
 
 use lib $libpath || die("no libpath");;
 use Util;
 use Lib;
 
-
-# Los datos que hacen falta de la configuracion son:
-#	~/grupo2/mae
-#	~/grupo2/ya/encuestas.sum
-#	~/grupo2/ya/
-#	~/grupo2/lib/ 
-
 my $grupo=$ENV{GRUPO};
 my $suma_encuestas=$ENV{ARCHIVO_ENCUESTAS};
 my $directorio_reportes=$ENV{DIRECTORIO_YA};
 
-# controlar variables de entorno
+# @todo: controlar variables de entorno
 
 my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
 my $maestro_encuestas="$grupo/mae/encuestas.mae";
 my $maestro_preguntas="$grupo/mae/preguntas.mae";
 
-
-
 my $salida_pantalla = 0;
 my $salida_archivo  = 0;
+my $salida_ficha    = 0;
 
 my @criterio_encuestadores;
 my @criterio_codigos;
@@ -57,11 +51,11 @@ my @criterio_sitios;
 my @criterio_agrupacion;
 
 
-# Refactorizacion 1
+# @todo: Refactorizacion 1
 # Llevar este codigo a Lib.pm
 # Debe devolver los arrays, salida, estado error/ayuda
 
-# Refactorizacion 2
+# @todo Refactorizacion 2
 # Mover a una funcion el codigo duplicado de -E -S -M -C -A
 
 my $indice  = 0;
@@ -69,10 +63,6 @@ my $indice  = 0;
 my $ayuda   = 0;
 my $error   = "";
 my $exit    = 0;
-
-# if ($#ARGV == -1 ) {
-#	 $error .= "Debe proveer algún argumento\n";
-# }
 
 while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 	my $elem = $ARGV[$indice];
@@ -86,7 +76,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		# Consulta a archivo
 		$salida_archivo = 1;
 	} elsif ($elem eq '-E' ) {
-		# Encuestador
+		# Criterio encuestadores
 		 my $fin_items= 0;
 		 while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
@@ -102,7 +92,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			$exit = 4;
 		}
 	} elsif ($elem eq '-C' ) {
-		# Codigo encuesta
+		# Criterio codigos encuesta
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
@@ -118,7 +108,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			$exit = 4;
 		}
 	} elsif ($elem eq '-N') {
-		# Numero de encuesta
+		# Criterio numero de encuesta
 		# @TODO: uno o dos numeros
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
@@ -135,7 +125,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			$exit = 4;
 		}
 	} elsif ($elem eq '-S') {
-		# Sitio de encuesta
+		# Criterio sitio de encuesta
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
@@ -152,7 +142,7 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		}
 
 	} elsif ($elem eq '-A') {
-		# Agrupacion
+		# Criterio de agrupacion
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
@@ -167,6 +157,8 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 			$error .= "Debe proveer algun elemento para -A\n";
 			$exit = 4;
 		}
+	} elsif ($elem eq '-F') {
+		$salida_ficha = 1;
 	} else {
 		$error .= "Argumento desconocido $elem\n";
 		$exit = 2;
@@ -174,16 +166,6 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 	$indice++;
 }
 
-# if ( ! $ayuda 
-# 	&& (
-# 		$criterio_encuestadores == -1 
-# 		&& $#criterio_codigos == -1 
-# 		&& $#criterio_numeros == -1 
-# 		&& $#criterio_sitios == -1) 
-# 	) {
-# 	$error .= "Debe proveer algún criterio -E -C -N -S\n";
-# }
-# 
 if ( ! $exit && ! $ayuda && ( $salida_pantalla == 0 && $salida_archivo == 0) ) {
 	$error .= "Debe proveer un destino -c o -e\n";
 	$exit = 3;
@@ -194,7 +176,7 @@ if ($error) {
 }
 
 if ($error || $ayuda) {
-	print STDERR "Mensaje de ayuda\n";
+	Lib::mostrar_ayuda;
 }
 
 if ($error) {
@@ -252,18 +234,16 @@ chomp;
 	my $modalidad;
 	my $persona;
 	( 
-		$registro{"encuestador"},
-		$fecha,
-		$registro{"numero"},
-		$registro{"codigo"},
-		$registro{"puntaje"},
-		$cliente,
-		$registro{"sitio"},
-		$modalidad,
-		$persona
+		$registro{'encuestador'},
+		$registro{'fecha'},
+		$registro{'numero'},
+		$registro{'codigo'},
+		$registro{'puntaje'},
+		$registro{'cliente'},
+		$registro{'sitio'},
+		$registro{'modalidad'},
+		$registro{'persona'}
 	) = split(/,/);
-
-	#$lista{$registro{"encuestador"}}=\%registro;
 
 # +Encuestador: key de %encuestadores
 # |        +Fecha:NO INTERESA
@@ -277,10 +257,13 @@ chomp;
 # |        |        |    |   |  |          | | |
 #ESTEPANO,20110909,1022,E03,12,30354444882,E,P,II
 
+	# Refactorizacion: utilizar $cumple_criterios en lugar de las siguientes y 
+	#                  aplicar optimización al flujo de evaluación.
 	my $cumple_encuestadores = 0;
 	my $cumple_numeros = 0;
 	my $cumple_sitios = 0;
 	my $cumple_codigos = 0;
+
 
 	if( @criterio_encuestadores == 0 ) {
 		$cumple_encuestadores = 1;
@@ -327,44 +310,49 @@ chomp;
 		}
 	}
 
+
+
 	#controlar que $registro cumpla el criterio
 	if ( $cumple_encuestadores
 		&& $cumple_numeros
 		&& $cumple_sitios
 		&& $cumple_codigos
 	) {
-		#Util::imprimir_hash( %registro );
-		#para cada encuesta,
-		#ver segun codigo de encuesta en encuestas.mae
-		#el puntaje a que le corresponde su puntaje
-		#e incrementar el color
-		#luego tener en cuenta la agrupacion
-		#my %encuesta = $encuestas{$registro{'codigo'}};
-		if ( $registro{"puntaje"} <= $encuestas{$registro{'codigo'}}{'rojo_fin'} ) {
+		my $color;
+		if ( $registro{'puntaje'} <= $encuestas{$registro{'codigo'}}{'rojo_fin'} ) {
 			$rojo++;
-			print STDERR $registro{"puntaje"} . " corresponde a ROJO\n";
-		} elsif ( $registro{"puntaje"} >= $encuestas{$registro{'codigo'}}{'verde_inicio'} ) {
+			$color = 'rojo';
+		} elsif ( $registro{'puntaje'} >= $encuestas{$registro{'codigo'}}{'verde_inicio'} ) {
 			$verde++;
-			print STDERR $registro{"puntaje"} . " corresponde a VERDE\n";
+			$color = 'verde';
 		} else {
 			$amarillo++;
-			print STDERR $registro{"puntaje"} . " corresponde a AMARILLO\n";
+			$color = 'amarillo';
 		}
-		
+
+		if ($salida_ficha) {
+			Lib::mostrar_ficha(
+				*STDERR,
+				$registro{'numero'},
+				$registro{'encuestador'} . ' ' .$encuestadores{$registro{'encuestador'}}{'nombre'},
+				$registro{'fecha'},
+				$registro{'cliente'},
+				$registro{'modalidad'},
+				$registro{'sitio'},
+				$registro{'persona'},
+				$registro{'codigo'} . ' ' . $encuestas{$registro{'codigo'}}{'nombre'},
+				$encuestas{$registro{'codigo'}}{'cantidad'},
+				$registro{'puntaje'},
+				$color
+			);
+		}
+		print STDERR $registro{'puntaje'} . " corresponde a $color\n";
 	}
 	
 }
 close(ARCHIVO);
 
 
+# mostrar resultados
 
 
-
-
-# 
-# -c 
-# -e
-# -h
-# 
-# outdir=ya
-# reportname=fecha:hora.txt
