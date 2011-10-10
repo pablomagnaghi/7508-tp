@@ -75,4 +75,8 @@ sub imprimir_maestro(@) {
 
 }
 
+sub dieWithCode($$) {
+	print STDERR $_[0];
+	exit $_[1];
+}
 1;

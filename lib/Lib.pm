@@ -93,7 +93,7 @@ our @EXPORT = qw(
 sub cargar_encuestas($) {
 	my ($archivo) = @_;
 	my %lista;
-	open(ARCHIVO,$archivo) || die ("No se pudo cargar $archivo: $!");
+	open(ARCHIVO,$archivo) || Util::dieWithCode ("No se pudo cargar $archivo: $!",5);
 	while (<ARCHIVO>) {
 		chomp;
 		my %registro;
@@ -134,7 +134,7 @@ sub cargar_encuestas($) {
 sub cargar_encuestadores($) {
 	my ($archivo) = @_;
 	my %lista;
-	open(ARCHIVO,$archivo) || die ("No se pudo cargar $archivo: $!");
+	open(ARCHIVO,$archivo) || Util::dieWithCode ("No se pudo cargar $archivo: $!",5);
 	while (<ARCHIVO>) {
 		chomp;
 		my %registro;
@@ -171,7 +171,7 @@ sub cargar_encuestadores($) {
 sub cargar_preguntas($){
 	my ($archivo) = @_;
 	my %lista;
-	open(ARCHIVO,$archivo) || die ("No se pudo cargar $archivo: $!");
+	open(ARCHIVO,$archivo) || Util::dieWithCode ("No se pudo cargar $archivo: $!",5);
 	while (<ARCHIVO>) {
 		chomp;
 		my %registro;
