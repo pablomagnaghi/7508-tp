@@ -74,6 +74,18 @@ our @EXPORT = qw(
 #	 },
 # );
 
+
+sub wildcard($) {
+	my ($r) = @_;
+	$r =~ s/\*/.*/g;
+	$r =~ s/\?/./g;
+	return '^' . $r . '$';
+}
+
+sub es_numero($) {
+	return $_[0] =~ /^-?\d+$/;
+}
+
 #
 # Uso: cargar_encuestas(archivo) 
 # 

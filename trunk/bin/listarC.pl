@@ -12,6 +12,7 @@
 # 4: criterio vacio
 # 5: falla lectura archivo
 # 6: variables de entorno no definidas
+# 7: mal tipo argumento
 
 # Suposiciones:
 # encuestas.sum esta bien formado y es válido
@@ -117,14 +118,17 @@ while ($indice < $#ARGV + 1  && ! $ayuda && ! $error) {
 		}
 	} elsif ($elem eq '-N') {
 		# Criterio numero de encuesta
-		# @TODO: uno o dos numeros
 		my $fin_items= 0;
 		while ($indice < $#ARGV && ! $fin_items) {
 			$indice++;
 			if ( $ARGV[$indice] =~ /^-.*/ ) {
 				$indice--;
 				$fin_items = 1;
+			} elsif ( ! Lib::es_numero($ARGV[$indice])) {
+				$error .= "Número de encuesta debe ser un número\n";
+				$exit = 7;
 			} else {
+				
 				push(@criterio_numeros, ($ARGV[$indice])); 
 			}
 		}
@@ -283,8 +287,7 @@ chomp;
 		$cumple_encuestadores = 1;
 	} else {
 		foreach (@criterio_encuestadores) {
-			my $pattern= '^' . $_ . '$';                  #@todo: que soporte comodines en lugar de regexps
-			if ($registro{'encuestador'} =~ $pattern ) {  #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'encuestador'} =~ Lib::wildcard($_) ) {
 				$cumple_encuestadores = 1;
 				last;
 			}
@@ -295,8 +298,7 @@ chomp;
 		$cumple_sitios = 1;
 	} else {
 		foreach (@criterio_sitios) {
-			my $pattern= '^' . $_ . '$';            #@todo: que soporte comodines en lugar de regexps
-			if ($registro{'sitio'} =~ $pattern ) {  #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'sitio'} =~ Lib::wildcard($_)) {
 				$cumple_sitios = 1;
 				last;
 			}
@@ -307,8 +309,7 @@ chomp;
 		$cumple_codigos = 1;
 	} else {
 		foreach (@criterio_codigos) {
-			my $pattern= '^' . $_ . '$';            #@todo: que soporte comodines en lugar de regexps
-			if ($registro{'codigo'} =~ $pattern ) { #@todo: que soporte comodines en lugar de regexps
+			if ($registro{'codigo'} =~ Lib::wildcard($_) ) {
 				$cumple_codigos = 1;
 				last;
 			}
@@ -318,7 +319,7 @@ chomp;
 	if( @criterio_numeros == 0 ) {
 		$cumple_numeros = 1;
 	} elsif ( @criterio_numeros == 1 ) {
-		if ($registro{'numero'} =~ $criterio_numeros[0] ) { 
+		if ($registro{'numero'} == $criterio_numeros[0] ) { 
 			$cumple_numeros = 1;
 		}
 	} else {
