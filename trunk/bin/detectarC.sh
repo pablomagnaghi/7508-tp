@@ -24,7 +24,7 @@ do
 	for file in $(ls | grep -i '^[a-z]*\.[0-9]*$');
 	do
         	userid=$(echo $file | cut -d "." -f 1);
-	        idmatch=$(grep "^.*,.*,${userid}," encuestadores.mae);
+	        idmatch=$(grep "^.*,.*,${userid}," $GRUPO/mae/encuestadores.mae);
         	if [ "$idmatch" == "" ]; then
 			mv $file $GRUPO/rechazados/;
                	 	#loguear error
