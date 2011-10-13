@@ -5,6 +5,6 @@ if [ -e data.txt ]; then
 	echo "demonio corriendo";
 else
 	echo "arrancando demonio";
-	cd $GRUPO/comandos/;
+	cd $GRUPO/inst/comandos/;
 	detectarC.sh &
 fi;
