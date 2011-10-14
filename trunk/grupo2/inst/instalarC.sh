@@ -75,22 +75,22 @@ verificarLineaArchivoConf () {
 
 verificarIntegridadArchivoConf () {
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CURRDIR | sed 's/CURRDIR=//'` != "$GRUPO" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CURRDIR | sed 's/CURRDIR=//'` != "\$GRUPO" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CONFDIR | sed 's/CONFDIR=//'` != "$GRUPO/conf" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CONFDIR | sed 's/CONFDIR=//'` != "\$GRUPO/conf" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep DATAMAE | sed 's/DATAMAE=//'` != "$GRUPO/mae" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep DATAMAE | sed 's/DATAMAE=//'` != "\$GRUPO/mae" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep LIBDIR | sed 's/LIBDIR=//'` != "$GRUPO/lib" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep LIBDIR | sed 's/LIBDIR=//'` != "\$GRUPO/lib" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
