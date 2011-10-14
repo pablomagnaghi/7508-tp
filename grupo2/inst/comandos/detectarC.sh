@@ -2,8 +2,6 @@
 
 #Inicializo variables
 pid=$(ps | grep -m 1 detectarC.sh | awk '{ print $1 }');
-ARRIDIR='/home/luis/Escritorio/prueba';
-GRUPO='/home/luis/Escritorio';
 
 #Guardo el pid en el archivo .data.txt
 echo $pid > .data.txt;
@@ -45,7 +43,6 @@ do
 	cd $GRUPO/preparados/;
 	arch=$(ls -a);
 	if [ arch != "" ]; then	
-		echo "hay algo";
 		#sumarC
 	fi
 
