@@ -18,6 +18,8 @@ our @EXPORT = qw(
 );
 sub hash_walk($$$);
 
+# Uso:
+# hash_walk(\%data, [], \&print_keys_and_value);
 sub hash_walk($$$) {
 	my ($hash, $key_list, $callback) = @_;
 	while (my ($k, $v) = each %$hash) {

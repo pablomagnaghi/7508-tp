@@ -342,9 +342,7 @@ chomp;
 		}
 		
 
-		if ( $#criterio_agrupacion == -1 ) {
-			$clave_agrupacion='todos';
-		} else {
+		if ( $#criterio_agrupacion != -1 ) {
 			$clave_agrupacion='';
 			foreach my $agrupacion (@criterio_agrupacion) {
 				if ($agrupacion eq 'e' ) {

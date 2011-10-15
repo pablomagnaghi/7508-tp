@@ -129,9 +129,11 @@ sub cargar_encuestas($) {
 
 sub mostrar_reporte {
 	my ($salida, %reporte) = @_;
-	my ($rojo, $amarillo, $verde, $grupo, %colores);
-
-	my $ancho = 0;
+	my ( $grupo, %colores);
+	my $total_rojo     = 0;
+	my $total_amarillo = 0;
+	my $total_verde    = 0;
+	my $ancho    = length('Totales');
 	while ( ($grupo,$colores) = each(%reporte) ) {
 		my $actual = length($grupo);
 		$ancho = $actual if $ancho < $actual;
@@ -148,16 +150,38 @@ sub mostrar_reporte {
 	$formato_reporte = "format REPORTE=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
 	eval $formato_stdout;
 
+# 	foreach $grupo (sort keys %reporte) {
+# 		#print "$key: $coins{$key}<br />";
+# 		$verde    = $reporte->{$grupo}{'verde'};
+# 		$amarillo = $reporte->{$grupo}{'amarillo'};
+# 		$rojo     = $reporte->{$grupo}{'rojo'};
+	#Util::hash_walk(\%reporte, [], \&Util::print_keys_and_value);
+
+
 	while ( ($grupo,$colores) = each(%reporte) ) {
-		$verde    = $colores->{'verde'};
-		$amarillo = $colores->{'amarillo'};
-		$rojo     = $colores->{'rojo'};
-		$verde    = '--' if ! $verde;
-		$amarillo = '--' if ! $amarillo;
-		$rojo     = '--' if ! $rojo;
-		write  $salida;
+		$verde           = $colores->{'verde'};
+		$amarillo        = $colores->{'amarillo'};
+		$rojo            = $colores->{'rojo'};
+		$total_verde    += $verde    if $verde;
+		$total_amarillo += $amarillo if $amarillo;
+		$total_rojo     += $rojo     if $rojo;
+		$verde           = '--' if ! $verde;
+		$amarillo        = '--' if ! $amarillo;
+		$rojo            = '--' if ! $rojo;
+		if ($grupo) {
+			write  $salida;
+		}
 	}
-	
+	$grupo = 'Totales';
+
+	$verde    =  $total_verde;
+	$amarillo =  $total_amarillo;
+	$rojo     =  $total_rojo;
+	$verde    = '--' if ! $verde;
+	$amarillo = '--' if ! $amarillo;
+	$rojo     = '--' if ! $rojo;
+
+	write $salida;
 	print  $salida  "+--" . "-"x$ancho . "+----------+----------+----------+\n";
 }
 
