@@ -29,7 +29,6 @@ BEGIN {
 		exit 6;
 	}
 	$libpath = $ENV{'DIRECTORIO_LIB'};
-	print "$libpath\n";
 }
 
 use lib $libpath || die("no libpath");
@@ -215,12 +214,6 @@ my %encuestas     = Lib::cargar_encuestas($maestro_encuestas);
 my %encuestadores = Lib::cargar_encuestadores($maestro_encuestadores);
 my %preguntas     = Lib::cargar_preguntas($maestro_preguntas);
 
-# Esto debe ser reemplazado por la estructura de agrupacion
-my $rojo = 0;
-my $amarillo = 0;
-my $verde = 0;
-
-
 # Manejo de reporte
 if ($salida_pantalla) {
 	push(@salidas, *STDOUT);
@@ -242,6 +235,12 @@ if ($salida_archivo) {
 		push(@salidas, *REPORTE);
 	}
 }
+
+
+# Esto debe ser reemplazado por la estructura de agrupacion
+my $rojo = 0;
+my $amarillo = 0;
+my $verde = 0;
 
 my %lista;
 open(ARCHIVO,$suma_encuestas) || Util::dieWithCode("No se pudo cargar $suma_encuestas: $!", 5);
@@ -371,10 +370,14 @@ chomp;
 				@salidas
 			);
 		}
-		print STDERR $registro{'puntaje'} . " corresponde a $color\n";
+		
 	}
 	
 }
+if (! $salida_ficha) {
+	Lib::mostrar_reporte($rojo,$amarillo,$verde,@salidas);
+}
+print STDERR "$verde,$amarillo,$rojo\n";
 close(ARCHIVO);
 
 # @todo: mostrar resultados
