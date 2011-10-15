@@ -75,43 +75,43 @@ verificarLineaArchivoConf () {
 
 verificarIntegridadArchivoConf () {
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CURRDIR | sed 's/CURRDIR=//'` != "\$GRUPO" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CURRDIR | sed 's/CURRDIR=//'` != "$GRUPO" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CONFDIR | sed 's/CONFDIR=//'` != "\$GRUPO/conf" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep CONFDIR | sed 's/CONFDIR=//'` != "$GRUPO/conf" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep DATAMAE | sed 's/DATAMAE=//'` != "\$GRUPO/mae" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep DATAMAE | sed 's/DATAMAE=//'` != "$GRUPO/mae" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	if [ `cat "$GRUPO/conf/instalarC.conf" | grep LIBDIR | sed 's/LIBDIR=//'` != "\$GRUPO/lib" ];then
+	if [ `cat "$GRUPO/conf/instalarC.conf" | grep LIBDIR | sed 's/LIBDIR=//'` != "$GRUPO/lib" ];then
 		loguear 2 "Archivo de configuración corrupto."
 		procesoCancelado
 	fi
 
-	#BINDIR=`cat "$GRUPO/conf/instalarC.conf" | grep BINDIR | sed 's/BINDIR=//'`
-	#verificarLineaArchivoConf "$BINDIR"
+	BINDIR=`cat "$GRUPO/conf/instalarC.conf" | grep BINDIR | sed 's/BINDIR=//'`
+	verificarLineaArchivoConf "$BINDIR"
 
-	#ARRIDIR=`cat "$GRUPO/conf/instalarC.conf" | grep ARRIDIR | sed 's/ARRIDIR=//'`
-	#verificarLineaArchivoConf "$ARRIDIR"
+	ARRIDIR=`cat "$GRUPO/conf/instalarC.conf" | grep ARRIDIR | sed 's/ARRIDIR=//'`
+	verificarLineaArchivoConf "$ARRIDIR"
 	
-	#DATASIZE=`cat "$GRUPO/conf/instalarC.conf" | grep DATASIZE | sed 's/DATASIZE=//'`
-	#verificarLineaArchivoConf "$DATASIZE"
+	DATASIZE=`cat "$GRUPO/conf/instalarC.conf" | grep DATASIZE | sed 's/DATASIZE=//'`
+	verificarLineaArchivoConf "$DATASIZE"
 
-	#LOGDIR=`cat "$GRUPO/conf/instalarC.conf" | grep LOGDIR | sed 's/LOGDIR=//'`
-	#verificarLineaArchivoConf "$LOGDIR"
+	LOGDIR=`cat "$GRUPO/conf/instalarC.conf" | grep LOGDIR | sed 's/LOGDIR=//'`
+	verificarLineaArchivoConf "$LOGDIR"
 
-	#LOGEXT=`cat "$GRUPO/conf/instalarC.conf" | grep LOGEXT | sed 's/LOGEXT=//'`
-	#verificarLineaArchivoConf "$LOGEXT"
+	LOGEXT=`cat "$GRUPO/conf/instalarC.conf" | grep LOGEXT | sed 's/LOGEXT=//'`
+	verificarLineaArchivoConf "$LOGEXT"
 
-	#LOGSIZE=`cat "$GRUPO/conf/instalarC.conf" | grep MAXLOGSIZE | sed 's/MAXLOGSIZE=//'`
-	#verificarLineaArchivoConf "$LOGSIZE"
+	LOGSIZE=`cat "$GRUPO/conf/instalarC.conf" | grep MAXLOGSIZE | sed 's/MAXLOGSIZE=//'`
+	verificarLineaArchivoConf "$LOGSIZE"
 }
 
 detectarPaqueteInstalado () {
@@ -175,12 +175,12 @@ detectarPaqueteInstalado () {
 
 confirmarCompletarInstalacion () {
 	loguear 1 "Confirmando completar instalación."
-	#BINDIR=`cat "$GRUPO/conf/instalarC.conf" | grep BINDIR | sed 's/BINDIR=//'`
-	#ARRIDIR=`cat "$GRUPO/conf/instalarC.conf" | grep ARRIDIR | sed 's/ARRIDIR=//'`
-	#DATASIZE=`cat "$GRUPO/conf/instalarC.conf" | grep DATASIZE | sed 's/DATASIZE=//'`
-	#LOGDIR=`cat "$GRUPO/conf/instalarC.conf" | grep LOGDIR | sed 's/LOGDIR=//'`
-	#LOGEXT=`cat "$GRUPO/conf/instalarC.conf" | grep LOGEXT | sed 's/LOGEXT=//'`
-	#LOGSIZE=`cat "$GRUPO/conf/instalarC.conf" | grep MAXLOGSIZE | sed 's/MAXLOGSIZE=//'`
+	BINDIR=`cat "$GRUPO/conf/instalarC.conf" | grep BINDIR | sed 's/BINDIR=//'`
+	ARRIDIR=`cat "$GRUPO/conf/instalarC.conf" | grep ARRIDIR | sed 's/ARRIDIR=//'`
+	DATASIZE=`cat "$GRUPO/conf/instalarC.conf" | grep DATASIZE | sed 's/DATASIZE=//'`
+	LOGDIR=`cat "$GRUPO/conf/instalarC.conf" | grep LOGDIR | sed 's/LOGDIR=//'`
+	LOGEXT=`cat "$GRUPO/conf/instalarC.conf" | grep LOGEXT | sed 's/LOGEXT=//'`
+	LOGSIZE=`cat "$GRUPO/conf/instalarC.conf" | grep MAXLOGSIZE | sed 's/MAXLOGSIZE=//'`
 	loguear 3 "Se instalarán los componentes faltantes y los parámetros de instalación serán los siguientes:"	
 	loguear 3 "***********************************************************************"
 	loguear 3 "* Parámetros de Instalación del paquete Consultar                     *"
@@ -675,7 +675,7 @@ mostrarMensajeFinInstalacion () {
 	local noInstalados=""
 
 	loguear 1 "Mostrando mensaje fin de instalación."
-	#detectarPaqueteInstalado 
+	detectarPaqueteInstalado 
 	loguear 3 "* FIN del Proceso de Instalación Copyright SisOp (c)2011*"
 	loguear 3 "*********************************************************"
 }
