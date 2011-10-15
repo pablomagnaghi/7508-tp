@@ -15,6 +15,7 @@ fi
 
 #Para uso del autor la línea 17, luego debe borrarse para integración
 GRUPO=/home/pablo/Escritorio/tp
+#GRUPO=/home/luis/Escritorio/grupo2
 
 #VERIFICO LA EXISTENCIA DEL ARCHIVO DE CONFIGURACION
 
@@ -152,9 +153,11 @@ DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
 
 #Verifico si el demonio esta corriendo
 
+. $LIBDIR/$START
+
 if [ -z "$DEMONIO_CORRIENDO" ]; then
 	cd $LIBDIR
-	./$START
+	startD
 	if [ $? -ne 0 ]; then
 		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
 		exit 1
@@ -162,7 +165,7 @@ if [ -z "$DEMONIO_CORRIENDO" ]; then
 		#Busco el número de pid en el archivo data.txt
 		#Hipotesis: este archivo esta en la carpeta actual si startD.sh
 		#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
-		ARCHIVO_PID="data.txt"
+		ARCHIVO_PID=".data.txt"
 		if [ ! -r $LIBDIR/$ARCHIVO_PID ]; then
 			echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
 			exit 1
