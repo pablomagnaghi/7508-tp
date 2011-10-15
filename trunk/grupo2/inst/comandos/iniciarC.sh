@@ -14,7 +14,7 @@ if [ $# -gt 0 ]; then
 fi
 
 #Para uso del autor la línea 17, luego debe borrarse para integración
-. setGrupoPablo.sh 
+GRUPO=/home/pablo/Escritorio/tp
 
 #VERIFICO LA EXISTENCIA DEL ARCHIVO DE CONFIGURACION
 
@@ -74,18 +74,6 @@ for i in "${DIRECTORIOS[@]}";do
 	fi
 done
 
-ENCUESTAS_SUM="/encuestas.sum"
-ESCUESTAS_RECH="/encuestas.rech"
-
-ARCHIVOS=( ENCUESTAS_SUM ESCUESTAS_RECH )
-
-for i in "${ARCHIVOS[@]}";do
-	if [ ! -r $GRUPO$YA${!i} -o ! -w $GRUPO$YA${!i} ]; then
-		echo "Inicialización de ambiente no fue exitosa. No existe archivo $GRUPO$YA${!i} o no tiene permisos de lectura y/o escritura"
-		exit 1
-	fi
-done
-
 
 DIRECTORIOS=( CONFDIR DATAMAE LIBDIR ARRIDIR LOGDIR BINDIR )
 
@@ -97,15 +85,13 @@ for i in "${DIRECTORIOS[@]}";do
 	fi
 done
 
-#Verifico la existencia de los archivos
+#Verifico la existencia de los archivos en BINDIR
 
 DETECTAR="detectarC.sh"
 SUMAR="sumarC.sh"
 LISTAR="listarC.pl"
-START="startD.sh"
-STOP="stopD.sh"
 
-ARCHIVOS=( DETECTAR SUMAR LISTAR START STOP )
+ARCHIVOS=( DETECTAR SUMAR LISTAR )
 
 for i in "${ARCHIVOS[@]}";do
 	if [ ! -x ${!i} ]; then
@@ -113,6 +99,24 @@ for i in "${ARCHIVOS[@]}";do
 		exit 1
 	fi
 done
+
+#Verifico la existencia de los archivos
+
+LOGUEAR="loguearC.sh"
+MIRAR="mirarC.sh"
+MOVER="moverC.sh"
+START="startD.sh"
+STOP="stopD.sh"
+
+ARCHIVOS=( LOGUEAR MIRAR MOVER START STOP )
+
+for i in "${ARCHIVOS[@]}";do
+	if [ ! -x $LIBDIR/${!i} ]; then
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${!i} o no tiene permiso de ejecución"
+		exit 1
+	fi
+done
+
 
 #Verifico existencia de los archivos maestros
 
@@ -149,6 +153,7 @@ DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
 #Verifico si el demonio esta corriendo
 
 if [ -z "$DEMONIO_CORRIENDO" ]; then
+	cd $LIBDIR
 	./$START
 	if [ $? -ne 0 ]; then
 		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
@@ -158,8 +163,8 @@ if [ -z "$DEMONIO_CORRIENDO" ]; then
 		#Hipotesis: este archivo esta en la carpeta actual si startD.sh
 		#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
 		ARCHIVO_PID="data.txt"
-		if [ ! -r $ARCHIVO_PID ]; then
-			echo "Inicialización de ambiente no fue exitosa. No existe archivo ${ARCHIVO_PID} o no tiene permiso de lectura"
+		if [ ! -r $LIBDIR/$ARCHIVO_PID ]; then
+			echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
 			exit 1
 		else
 			PID=$(cat $ARCHIVO_PID)	
@@ -170,6 +175,8 @@ else
 	exit 1
 fi
 
+#exporto variables para los comandos sumar y listar
+ENCUESTAS_SUM="/encuestas.sum"
 export ARCHIVO_ENCUESTAS=$GRUPO$YA$ENCUESTAS_SUM
 export DIRECTORIO_YA=$GRUPO$YA
 
@@ -183,26 +190,4 @@ done
 echo "Demonio corriendo bajo el Nro.: <$PID>"
 
 exit 0
-
-
-#-------------ESTA PARTE QUEDA HASTA EL MARTES CUANDO NOS RESPONDAN SI PODEMOS OPTIMIZAR-----------------
-#ps -ef lista todos los procesos actualmente en ejecución
-
-#DEMONIO_CORRIENDO=$(ps -ef | grep "$DETECTAR")
-
-#DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
-
-#verifico si el demonio esta corriendo
-
-#if [ -z "$DEMONIO_CORRIENDO" ]; then
-#	$DETECTAR &
-#	pid=$!
-#	if [ $? -ne 0 ]; then
-#		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando $DETECTAR"
-#		exit 1
-#	fi
-#else
-#	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
-#	exit 1
-#fi
 
