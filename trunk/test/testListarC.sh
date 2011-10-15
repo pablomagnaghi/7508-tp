@@ -9,6 +9,18 @@
 # iniciarC.sh
 RUN="../grupo2/inst/comandos/listarC.pl"
 
+
+extraDiff() {
+	if [ $1 -eq 1 ]; then
+		echo "------------------------------------------------------------------"
+		echo "Fail....";
+		echo "$2" > esperado.txt
+		echo "$3" > salida.txt
+		diff --side-by-side esperado.txt salida.txt
+		echo "------------------------------------------------------------------"
+	fi
+}
+
 testExitNoSalida() {
 	$RUN > /dev/null 2>&1
 	exit=$?
@@ -119,43 +131,41 @@ Puntaje obtenido: 12 calificación: amarillo
 
 	salida=$( $RUN 2>/dev/null -e -c -E EPORRA -F  )
 	assertEquals "Salida de ficha no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
 }
 
 
 testOutputReporteSinAgrupacionUnCaso() {
 esperado="+-------+----------+----------+----------+
-|       | verde    | amarillo | rojo     |
+|       |    verde | amarillo |     rojo |
 +-------+----------+----------+----------+
 | todos |       -- |        1 |       -- |
 +-------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -e -c -E EPORRA )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
 }
 
 testOutputReporteSinAgrupacionVariosCasos() {
 esperado="+-------+----------+----------+----------+
-|       | verde    | amarillo | rojo     |
+|       |    verde | amarillo |     rojo |
 +-------+----------+----------+----------+
 | todos |        2 |        3 |        2 |
 +-------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -e -c )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
 }
 
 notestOutputReporteAgrupadoPorEncuestadorUnCaso() {
 esperado="+--------+----------+----------+----------+
-|        | verde    | amarillo | rojo     |
+|        |    verde | amarillo |     rojo |
 +--------+----------+----------+----------+
 | EPORRA |        2 |        3 |        2 |
 +--------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -e -c )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
-	if [ $? -eq 1 ]; then
-		echo "Fail....";
-		echo "$esperado" > esperado.txt
-		echo "$salida" > salida.txt
-		diff --side-by-side esperado.txt salida.txt
-	fi
+	extraDiff $? "$esperado" "$salida"
 }
 
 

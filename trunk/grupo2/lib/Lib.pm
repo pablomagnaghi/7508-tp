@@ -128,26 +128,37 @@ sub cargar_encuestas($) {
 }
 
 sub mostrar_reporte {
-	my ($salida, $verde,$amarillo,$rojo) = @_;
-	$verde    = '--' if ! $verde;
-	$amarillo = '--' if ! $amarillo;
-	$rojo     = '--' if ! $rojo;
-	print  $salida  "+-------+----------+----------+----------+\n";
-	print  $salida  "|       | verde    | amarillo | rojo     |\n";
-	print  $salida  "+-------+----------+----------+----------+\n";
-	write  $salida;
-	print  $salida  "+-------+----------+----------+----------+\n";
+	my ($salida, %reporte) = @_;
+	my ($rojo, $amarillo, $verde, $grupo, %colores);
+
+	my $ancho = 0;
+	while ( ($grupo,$colores) = each(%reporte) ) {
+		my $actual = length($grupo);
+		$ancho = $actual if $ancho < $actual;
+	}
+
+	my $relleno = ">"x$ancho;
+
+	print  $salida  "+-" . "-"x$ancho . "-+----------+----------+----------+\n";
+	print  $salida  "| " . " "x$ancho . " |    verde | amarillo |     rojo |\n";
+	print  $salida  "+-" . "-"x$ancho . "-+----------+----------+----------+\n";
 
 
-format STDOUT =
-| todos | @>>>>>>> | @>>>>>>> | @>>>>>>> |
-$verde, $amarillo, $rojo
-.
+	$formato_stdout  = "format STDOUT=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
+	$formato_reporte = "format REPORTE=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
+	eval $formato_stdout;
 
-format REPORTE =
-| todos | @>>>>>>> | @>>>>>>> | @>>>>>>> |
-$verde, $amarillo, $rojo
-.
+	while ( ($grupo,$colores) = each(%reporte) ) {
+		$verde    = $colores->{'verde'};
+		$amarillo = $colores->{'amarillo'};
+		$rojo     = $colores->{'rojo'};
+		$verde    = '--' if ! $verde;
+		$amarillo = '--' if ! $amarillo;
+		$rojo     = '--' if ! $rojo;
+		write  $salida;
+	}
+	
+	print  $salida  "+--" . "-"x$ancho . "+----------+----------+----------+\n";
 }
 
 sub mostrar_ficha {
