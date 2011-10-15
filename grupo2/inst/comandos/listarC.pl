@@ -237,12 +237,7 @@ if ($salida_archivo) {
 }
 
 
-# Esto debe ser reemplazado por la estructura de agrupacion
-my $rojo = 0;
-my $amarillo = 0;
-my $verde = 0;
-
-my %lista;
+my %reporte;
 open(ARCHIVO,$suma_encuestas) || Util::dieWithCode("No se pudo cargar $suma_encuestas: $!", 5);
 while (<ARCHIVO>) {
 chomp;
@@ -343,14 +338,16 @@ chomp;
 		} else {
 			$color = 'amarillo';
 		}
+		
 
+		#if ( $#criterio_agrupacion == -1 ) {
 		# @todo: logica de agrupamiento
 		if ($color eq 'rojo') {
-			$rojo++;
+			$reporte{'todos'}{'rojo'}++;
 		} elsif ($color eq 'verde') {
-			$verde++;
+			$reporte{'todos'}{'verde'}++;
 		} else {
-			$amarillo++;
+			$reporte{'todos'}{'amarillo'}++;
 		}
 
 
@@ -378,10 +375,10 @@ chomp;
 }
 if (! $salida_ficha) {
 	foreach my $salida (@salidas) {
-		Lib::mostrar_reporte($salida, $rojo,$amarillo,$verde);
+		Lib::mostrar_reporte($salida, %reporte);
 	}
 }
-print STDERR "$verde,$amarillo,$rojo\n";
+
 close(ARCHIVO);
 
 # @todo: mostrar resultados
