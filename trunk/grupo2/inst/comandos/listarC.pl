@@ -24,29 +24,30 @@ use warnings;
 # adaptado de http://www.perlmonks.org/index.pl?node_id=162876
 my $libpath; 
 BEGIN {
-	if (!defined( $ENV{'GRUPO'}) ) {
-		print STDERR "Variables de entorno GRUPO no definida\n";
+	if (!defined( $ENV{'DIRECTORIO_LIB'}) ) {
+		print STDERR "Variables de entorno DIRECTORIO_LIB no definida\n";
 		exit 6;
 	}
-	$libpath = $ENV{'GRUPO'} . "/lib";
+	$libpath = $ENV{'DIRECTORIO_LIB'};
+	print "$libpath\n";
 }
 
-use lib $libpath || die("no libpath");;
+use lib $libpath || die("no libpath");
 use Util;
 use Lib;
 
-if (!defined($ENV{'ARCHIVO_ENCUESTAS'} ) ||!defined( $ENV{'DIRECTORIO_YA'}) ) {
+if (!defined($ENV{'ARCHIVO_ENCUESTAS'} ) ||!defined( $ENV{'DIRECTORIO_YA'}) ||!defined( $ENV{'DIRECTORIO_MAESTROS'}) ) {
 	Util::dieWithCode("Variables de entorno no definidas\n", 6);
 }
 
-my $grupo=$ENV{'GRUPO'};
+my $directorio_maestros=$ENV{'DIRECTORIO_MAESTROS'};
 my $suma_encuestas=$ENV{'ARCHIVO_ENCUESTAS'};
 my $directorio_reportes=$ENV{'DIRECTORIO_YA'};
 
 
-my $maestro_encuestadores="$grupo/mae/encuestadores.mae";
-my $maestro_encuestas="$grupo/mae/encuestas.mae";
-my $maestro_preguntas="$grupo/mae/preguntas.mae";
+my $maestro_encuestadores="$directorio_maestros/encuestadores.mae";
+my $maestro_encuestas="$directorio_maestros/encuestas.mae";
+my $maestro_preguntas="$directorio_maestros/preguntas.mae";
 
 my $salida_pantalla = 0;
 my $salida_archivo  = 0;
