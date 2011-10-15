@@ -127,6 +127,30 @@ sub cargar_encuestas($) {
 	return (%lista);
 }
 
+sub mostrar_reporte {
+	my ($verde,$amarillo,$rojo,@salidas) = @_;
+	foreach my $OUT (@salidas) {
+		$verde    = '--' if ! $verde;
+		$amarillo = '--' if ! $amarillo;
+		$rojo     = '--' if ! $rojo;
+		print  $OUT  "+-------+----------+----------+----------+\n";
+		print  $OUT  "|       | verde    | amarillo | rojo     |\n";
+		print  $OUT  "+-------+----------+----------+----------+\n";
+		write  $OUT;
+		print  $OUT  "+-------+----------+----------+----------+\n";
+
+	}
+
+format STDOUT =
+| todos | @>>>>>>> | @>>>>>>> | @>>>>>>> |
+$verde, $amarillo, $rojo
+.
+
+format REPORTE =
+| todos | @>>>>>>> | @>>>>>>> | @>>>>>>> |
+$verde, $amarillo, $rojo
+.
+}
 
 sub mostrar_ficha {
 	my ($numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color,@salidas) = @_;
