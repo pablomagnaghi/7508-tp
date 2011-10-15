@@ -355,27 +355,31 @@ chomp;
 
 
 		if ($salida_ficha) {
-			Lib::mostrar_ficha(
-				$registro{'numero'},
-				$registro{'encuestador'} . ' ' .$encuestadores{$registro{'encuestador'}}{'nombre'},
-				$registro{'fecha'},
-				$registro{'cliente'},
-				$registro{'modalidad'},
-				$registro{'sitio'},
-				$registro{'persona'},
-				$registro{'codigo'} . ' ' . $encuestas{$registro{'codigo'}}{'nombre'},
-				$encuestas{$registro{'codigo'}}{'cantidad'},
-				$registro{'puntaje'},
-				$color,
-				@salidas
-			);
+			foreach my $salida (@salidas) {
+				Lib::mostrar_ficha(
+					$salida,
+					$registro{'numero'},
+					$registro{'encuestador'} . ' ' .$encuestadores{$registro{'encuestador'}}{'nombre'},
+					$registro{'fecha'},
+					$registro{'cliente'},
+					$registro{'modalidad'},
+					$registro{'sitio'},
+					$registro{'persona'},
+					$registro{'codigo'} . ' ' . $encuestas{$registro{'codigo'}}{'nombre'},
+					$encuestas{$registro{'codigo'}}{'cantidad'},
+					$registro{'puntaje'},
+					$color
+				);
+			}
 		}
 		
 	}
 	
 }
 if (! $salida_ficha) {
-	Lib::mostrar_reporte($rojo,$amarillo,$verde,@salidas);
+	foreach my $salida (@salidas) {
+		Lib::mostrar_reporte($salida, $rojo,$amarillo,$verde);
+	}
 }
 print STDERR "$verde,$amarillo,$rojo\n";
 close(ARCHIVO);
