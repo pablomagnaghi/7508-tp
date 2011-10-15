@@ -8,6 +8,8 @@
 . ../extras/setGrupoCarlos.sh
 # iniciarC.sh
 RUN="../grupo2/inst/comandos/listarC.pl"
+LIMPIAR='../extras/ya/reporte* salida.txt esperado.txt'
+
 
 
 extraDiff() {
@@ -20,6 +22,11 @@ extraDiff() {
 		echo "------------------------------------------------------------------"
 	fi
 }
+
+oneTimeTearDown() {
+	rm $LIMPIAR
+}
+
 
 testExitNoSalida() {
 	$RUN > /dev/null 2>&1
@@ -100,19 +107,19 @@ testExitCriteriosVacios() {
 }
 
 testOutputCriteriosVacios() {
-	$RUN -E 2>&1 | grep -q -e "Debe proveer algun elemento para -E"
+	$RUN -c -E 2>&1 | grep -q -e "Debe proveer algun elemento para -E"
 	exit=$?
 	assertEquals "Critero vacio -E no detectado" 0 $exit
 
-	$RUN -C 2>&1 | grep -q -e "Debe proveer algun elemento para -C"
+	$RUN -c -C 2>&1 | grep -q -e "Debe proveer algun elemento para -C"
 	exit=$?
 	assertEquals "Critero vacio -C no detectado" 0 $exit
 
-	$RUN -N 2>&1 | grep -q -e "Debe proveer algun elemento para -N"
+	$RUN -c -N 2>&1 | grep -q -e "Debe proveer algun elemento para -N"
 	exit=$?
 	assertEquals "Critero vacio -N no detectado" 0 $exit
 
-	$RUN -S 2>&1 | grep -q -e "Debe proveer algun elemento para -S"
+	$RUN -c -S 2>&1 | grep -q -e "Debe proveer algun elemento para -S"
 	exit=$?
 	assertEquals "Critero vacio -S no detectado" 0 $exit
 }
@@ -124,24 +131,24 @@ esperado="Encuesta Nro: 1024 realizada por EPORRA Elisa Porra el dia 20110907
 
 Cliente 30354444882, Modalidad P, Sitio E y Persona II
 
-Encuesta aplicada E01 Estándar para nuevos clientes compuesta por 9 preguntas
+Encuesta aplicada E01 Estandar para nuevos clientes compuesta por 9 preguntas
 
 Puntaje obtenido: 12 calificación: amarillo
 --------------------------------------------------------------------------------"
 
-	salida=$( $RUN 2>/dev/null -e -c -E EPORRA -F  )
+	salida=$( $RUN 2>/dev/null -c -E EPORRA -F  )
 	assertEquals "Salida de ficha no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
 
 
-testOutputReporteSinAgrupacionUnCaso() {
+testOutputReporteSinAgrupacionUnCasoUnEncuestadorUnCaso() {
 esperado="+-------+----------+----------+----------+
 |       |    verde | amarillo |     rojo |
 +-------+----------+----------+----------+
 | todos |       -- |        1 |       -- |
 +-------+----------+----------+----------+"
-	salida=$( $RUN 2>/dev/null -e -c -E EPORRA )
+	salida=$( $RUN 2>/dev/null -c -E EPORRA )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
@@ -152,21 +159,43 @@ esperado="+-------+----------+----------+----------+
 +-------+----------+----------+----------+
 | todos |        2 |        3 |        2 |
 +-------+----------+----------+----------+"
-	salida=$( $RUN 2>/dev/null -e -c )
+	salida=$( $RUN 2>/dev/null -c )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
 
-notestOutputReporteAgrupadoPorEncuestadorUnCaso() {
-esperado="+--------+----------+----------+----------+
-|        |    verde | amarillo |     rojo |
-+--------+----------+----------+----------+
-| EPORRA |        2 |        3 |        2 |
-+--------+----------+----------+----------+"
-	salida=$( $RUN 2>/dev/null -e -c )
+testOutputReporteAgrupadoPorEncuestadorUnEncuestadorUnCaso() {
+esperado="+-------------+----------+----------+----------+
+|             |    verde | amarillo |     rojo |
++-------------+----------+----------+----------+
+| Elisa Porra |       -- |        1 |       -- |
++-------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A e -E EPORRA )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
 
+testOutputReporteAgrupadoPorEncuestadorUnEncuestadorVariosCasos() {
+esperado="+--------------+----------+----------+----------+
+|              |    verde | amarillo |     rojo |
++--------------+----------+----------+----------+
+| Elio Stepano |        2 |        2 |        2 |
++--------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A e -E ESTEPANO )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
+testOutputReporteAgrupadoPorEncuestadorYCodigoUnEncuestadorVariosCasos() {
+esperado="+------------------+----------+----------+----------+
+|                  |    verde | amarillo |     rojo |
++------------------+----------+----------+----------+
+| Elio Stepano.E02 |       -- |       -- |        1 |
+| Elio Stepano.E03 |        2 |        2 |        1 |
++------------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A e c -E ESTEPANO )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
 
 . shunit2/shunit2
