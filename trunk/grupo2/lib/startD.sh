@@ -1,11 +1,16 @@
 #startD.sh
 
-if [ -e data.txt ]; then
-	#agregar el log
-	echo "demonio corriendo";
-else
-	echo "arrancando demonio";
-	cd ..
-	cd inst/comandos/
-	detectarC.sh &
-fi;
+startD() {
+	#GRUPO="/home/luis/Escritorio/grupo2"
+
+	if [ -e data.txt ]; then
+		#agregar el log
+		echo "demonio corriendo";
+		return 1
+	else
+		echo "arrancando demonio";
+		$GRUPO/bin/detectarC.sh &
+		return 0
+	fi;
+
+}
