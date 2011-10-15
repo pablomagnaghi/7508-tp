@@ -24,7 +24,7 @@ extraDiff() {
 }
 
 oneTimeTearDown() {
-	rm $LIMPIAR
+	rm -f $LIMPIAR
 }
 
 
@@ -143,22 +143,22 @@ Puntaje obtenido: 12 calificación: amarillo
 
 
 testOutputReporteSinAgrupacionUnCasoUnEncuestadorUnCaso() {
-esperado="+-------+----------+----------+----------+
-|       |    verde | amarillo |     rojo |
-+-------+----------+----------+----------+
-| todos |       -- |        1 |       -- |
-+-------+----------+----------+----------+"
+esperado="+---------+----------+----------+----------+
+|         |    verde | amarillo |     rojo |
++---------+----------+----------+----------+
+| Totales |       -- |        1 |       -- |
++---------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -c -E EPORRA )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
 
 testOutputReporteSinAgrupacionVariosCasos() {
-esperado="+-------+----------+----------+----------+
-|       |    verde | amarillo |     rojo |
-+-------+----------+----------+----------+
-| todos |        2 |        3 |        2 |
-+-------+----------+----------+----------+"
+esperado="+---------+----------+----------+----------+
+|         |    verde | amarillo |     rojo |
++---------+----------+----------+----------+
+| Totales |        2 |        3 |        2 |
++---------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -c )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
@@ -169,6 +169,7 @@ esperado="+-------------+----------+----------+----------+
 |             |    verde | amarillo |     rojo |
 +-------------+----------+----------+----------+
 | Elisa Porra |       -- |        1 |       -- |
+|     Totales |       -- |        1 |       -- |
 +-------------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -c -A e -E EPORRA )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
@@ -180,6 +181,7 @@ esperado="+--------------+----------+----------+----------+
 |              |    verde | amarillo |     rojo |
 +--------------+----------+----------+----------+
 | Elio Stepano |        2 |        2 |        2 |
+|      Totales |        2 |        2 |        2 |
 +--------------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -c -A e -E ESTEPANO )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
@@ -192,6 +194,7 @@ esperado="+------------------+----------+----------+----------+
 +------------------+----------+----------+----------+
 | Elio Stepano.E02 |       -- |       -- |        1 |
 | Elio Stepano.E03 |        2 |        2 |        1 |
+|          Totales |        2 |        2 |        2 |
 +------------------+----------+----------+----------+"
 	salida=$( $RUN 2>/dev/null -c -A e c -E ESTEPANO )
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
