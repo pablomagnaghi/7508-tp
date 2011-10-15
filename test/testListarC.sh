@@ -1,8 +1,13 @@
 #!/bin/bash
 
+# Autor: Carlos Pantelides 74901
+# 
+# Test para listarc.pl
+
 #bootstrap
-. ../bin/setGrupoCarlos.sh
-RUN="../bin/listarC.pl"
+. ../extras/setGrupoCarlos.sh
+# iniciarC.sh
+RUN="../grupo2/inst/comandos/listarC.pl"
 
 testExitNoSalida() {
 	$RUN > /dev/null 2>&1
@@ -99,6 +104,24 @@ testOutputCriteriosVacios() {
 	exit=$?
 	assertEquals "Critero vacio -S no detectado" 0 $exit
 }
+
+# El resultado esperado es:
+
+#Encuesta Nro: 1024 realizada por EPORRA Elisa Porra el dia 20110907
+#
+#Cliente 30354444882, Modalidad P, Sitio E y Persona II
+#
+#Encuesta aplicada E01 Estándar para nuevos clientes compuesta por 9 preguntas
+#
+#Puntaje obtenido: 12 calificación: amarillo
+#--------------------------------------------------------------------------------
+
+# cuyo md5sum es 048435370be5eff7f4af5ad08b01ead8
+testOutputFicha() {
+	salida=$( $RUN 2>/dev/null -e -c -E EPORRA -F | md5sum )
+	assertEquals "Hash de salida no coincide" "048435370be5eff7f4af5ad08b01ead8  -" "$salida"
+}
+
 
 
 . shunit2/shunit2
