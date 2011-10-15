@@ -128,18 +128,16 @@ sub cargar_encuestas($) {
 }
 
 sub mostrar_reporte {
-	my ($verde,$amarillo,$rojo,@salidas) = @_;
-	foreach my $OUT (@salidas) {
-		$verde    = '--' if ! $verde;
-		$amarillo = '--' if ! $amarillo;
-		$rojo     = '--' if ! $rojo;
-		print  $OUT  "+-------+----------+----------+----------+\n";
-		print  $OUT  "|       | verde    | amarillo | rojo     |\n";
-		print  $OUT  "+-------+----------+----------+----------+\n";
-		write  $OUT;
-		print  $OUT  "+-------+----------+----------+----------+\n";
+	my ($salida, $verde,$amarillo,$rojo) = @_;
+	$verde    = '--' if ! $verde;
+	$amarillo = '--' if ! $amarillo;
+	$rojo     = '--' if ! $rojo;
+	print  $salida  "+-------+----------+----------+----------+\n";
+	print  $salida  "|       | verde    | amarillo | rojo     |\n";
+	print  $salida  "+-------+----------+----------+----------+\n";
+	write  $salida;
+	print  $salida  "+-------+----------+----------+----------+\n";
 
-	}
 
 format STDOUT =
 | todos | @>>>>>>> | @>>>>>>> | @>>>>>>> |
@@ -153,17 +151,15 @@ $verde, $amarillo, $rojo
 }
 
 sub mostrar_ficha {
-	my ($numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color,@salidas) = @_;
-	foreach my $OUT (@salidas) {
-		print $OUT "Encuesta Nro: $numero realizada por $usuario el dia $fecha\n";
-		print $OUT "\n";
-		print $OUT "Cliente $cliente, Modalidad $modalidad, Sitio $sitio y Persona $persona\n";
-		print $OUT "\n";
-		print $OUT "Encuesta aplicada $encuesta compuesta por $preguntas preguntas\n";
-		print $OUT "\n";
-		print $OUT "Puntaje obtenido: $puntaje calificación: $color\n";
-		print $OUT "--------------------------------------------------------------------------------\n";
-	}
+	my ($salida, $numero,$usuario,$fecha,$cliente,$modalidad,$sitio,$persona,$encuesta,$preguntas,$puntaje,$color) = @_;
+	print $salida "Encuesta Nro: $numero realizada por $usuario el dia $fecha\n";
+	print $salida "\n";
+	print $salida "Cliente $cliente, Modalidad $modalidad, Sitio $sitio y Persona $persona\n";
+	print $salida "\n";
+	print $salida "Encuesta aplicada $encuesta compuesta por $preguntas preguntas\n";
+	print $salida "\n";
+	print $salida "Puntaje obtenido: $puntaje calificación: $color\n";
+	print $salida "--------------------------------------------------------------------------------\n";
 }
 
 #
