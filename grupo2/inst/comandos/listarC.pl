@@ -238,6 +238,8 @@ if ($salida_archivo) {
 
 
 my %reporte;
+my $clave_agrupacion;
+
 open(ARCHIVO,$suma_encuestas) || Util::dieWithCode("No se pudo cargar $suma_encuestas: $!", 5);
 while (<ARCHIVO>) {
 chomp;
@@ -340,16 +342,32 @@ chomp;
 		}
 		
 
-		#if ( $#criterio_agrupacion == -1 ) {
-		# @todo: logica de agrupamiento
-		if ($color eq 'rojo') {
-			$reporte{'todos'}{'rojo'}++;
-		} elsif ($color eq 'verde') {
-			$reporte{'todos'}{'verde'}++;
+		if ( $#criterio_agrupacion == -1 ) {
+			$clave_agrupacion='todos';
 		} else {
-			$reporte{'todos'}{'amarillo'}++;
+			$clave_agrupacion='';
+			foreach my $agrupacion (@criterio_agrupacion) {
+				if ($agrupacion eq 'e' ) {
+					$clave_agrupacion .= $encuestadores{$registro{'encuestador'}}{'nombre'};
+				} elsif ($agrupacion eq 's') {
+					$clave_agrupacion .= $registro{'sitio'};
+				} elsif ($agrupacion eq 'n') {
+					$clave_agrupacion .=$registro{'numero'};
+				} elsif ($agrupacion eq 'c') {
+					$clave_agrupacion .=$registro{'codigo'};
+				}
+				$clave_agrupacion .='.';
+			}
+			$clave_agrupacion = substr($clave_agrupacion, 0, -1);
 		}
 
+		if ($color eq 'rojo') {
+			$reporte{$clave_agrupacion}{'rojo'}++;
+		} elsif ($color eq 'verde') {
+			$reporte{$clave_agrupacion}{'verde'}++;
+		} else {
+			$reporte{$clave_agrupacion}{'amarillo'}++;
+		}
 
 		if ($salida_ficha) {
 			foreach my $salida (@salidas) {
