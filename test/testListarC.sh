@@ -5,10 +5,15 @@
 # Test para listarc.pl
 
 #bootstrap
-. ../extras/setGrupoCarlos.sh
-# iniciarC.sh
+
+export GRUPO=/home/carlos/7508/7508fiuba2011g2/trunk
+export DIRECTORIO_LIB=$GRUPO/grupo2/lib
+export DIRECTORIO_MAESTROS=$GRUPO/grupo2/inst/mae
+export DIRECTORIO_YA=$GRUPO/test/fixtures
+export ARCHIVO_ENCUESTAS=$DIRECTORIO_YA/encuestas.sum
+
 RUN="../grupo2/inst/comandos/listarC.pl"
-LIMPIAR='../extras/ya/reporte* salida.txt esperado.txt'
+LIMPIAR="$DIRECTORIO_YA"'/reporte* salida.txt esperado.txt'
 
 
 
