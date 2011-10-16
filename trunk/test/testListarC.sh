@@ -5,12 +5,15 @@
 # Test para listarc.pl
 
 #bootstrap
-
 export GRUPO=/home/carlos/7508/7508fiuba2011g2/trunk
 export DIRECTORIO_LIB=$GRUPO/grupo2/lib
-export DIRECTORIO_MAESTROS=$GRUPO/grupo2/inst/mae
-export DIRECTORIO_YA=$GRUPO/test/fixtures
-export ARCHIVO_ENCUESTAS=$DIRECTORIO_YA/encuestas.sum
+
+
+fixture1() {
+	export DIRECTORIO_MAESTROS=$GRUPO/grupo2/inst/mae
+	export DIRECTORIO_YA=$GRUPO/test/fixtures
+	export ARCHIVO_ENCUESTAS=$DIRECTORIO_YA/encuestas.sum
+}
 
 RUN="../grupo2/inst/comandos/listarC.pl"
 LIMPIAR="$DIRECTORIO_YA"'/reporte* salida.txt esperado.txt'
@@ -131,8 +134,9 @@ testOutputCriteriosVacios() {
 
 
 testOutputFicha() {
-
-esperado="Encuesta Nro: 1024 realizada por EPORRA Elisa Porra el dia 20110907
+	fixture1
+	esperado=\
+"Encuesta Nro: 1024 realizada por EPORRA Elisa Porra el dia 20110907
 
 Cliente 30354444882, Modalidad P, Sitio E y Persona II
 
@@ -148,7 +152,9 @@ Puntaje obtenido: 12 calificación: amarillo
 
 
 testOutputReporteSinAgrupacionUnCasoUnEncuestadorUnCaso() {
-esperado="+---------+----------+----------+----------+
+	fixture1
+	esperado=\
+"+---------+----------+----------+----------+
 |         |    verde | amarillo |     rojo |
 +---------+----------+----------+----------+
 | Totales |       -- |        1 |       -- |
@@ -159,7 +165,9 @@ esperado="+---------+----------+----------+----------+
 }
 
 testOutputReporteSinAgrupacionVariosCasos() {
-esperado="+---------+----------+----------+----------+
+	fixture1
+	esperado=\
+"+---------+----------+----------+----------+
 |         |    verde | amarillo |     rojo |
 +---------+----------+----------+----------+
 | Totales |        2 |        3 |        2 |
@@ -170,7 +178,9 @@ esperado="+---------+----------+----------+----------+
 }
 
 testOutputReporteAgrupadoPorEncuestadorUnEncuestadorUnCaso() {
-esperado="+-------------+----------+----------+----------+
+	fixture1
+	esperado=\
+"+-------------+----------+----------+----------+
 |             |    verde | amarillo |     rojo |
 +-------------+----------+----------+----------+
 | Elisa Porra |       -- |        1 |       -- |
@@ -182,7 +192,9 @@ esperado="+-------------+----------+----------+----------+
 }
 
 testOutputReporteAgrupadoPorEncuestadorUnEncuestadorVariosCasos() {
-esperado="+--------------+----------+----------+----------+
+	fixture1
+	esperado=\
+"+--------------+----------+----------+----------+
 |              |    verde | amarillo |     rojo |
 +--------------+----------+----------+----------+
 | Elio Stepano |        2 |        2 |        2 |
@@ -194,7 +206,9 @@ esperado="+--------------+----------+----------+----------+
 }
 
 testOutputReporteAgrupadoPorEncuestadorYCodigoUnEncuestadorVariosCasos() {
-esperado="+------------------+----------+----------+----------+
+	fixture1
+	esperado=\
+"+------------------+----------+----------+----------+
 |                  |    verde | amarillo |     rojo |
 +------------------+----------+----------+----------+
 | Elio Stepano.E02 |       -- |       -- |        1 |
@@ -205,5 +219,84 @@ esperado="+------------------+----------+----------+----------+
 	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
 	extraDiff $? "$esperado" "$salida"
 }
+
+testOutputComodinesEAsterisco() {
+	fixture1
+	esperado=\
+"+--------------+----------+----------+----------+
+|              |    verde | amarillo |     rojo |
++--------------+----------+----------+----------+
+|  Elisa Porra |       -- |        1 |       -- |
+| Elio Stepano |        2 |        2 |        2 |
+|      Totales |        2 |        3 |        2 |
++--------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A e -E "E*" )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
+testOutputComodinesEPAsterisco() {
+	fixture1
+	esperado=\
+"+-------------+----------+----------+----------+
+|             |    verde | amarillo |     rojo |
++-------------+----------+----------+----------+
+| Elisa Porra |       -- |        1 |       -- |
+|     Totales |       -- |        1 |       -- |
++-------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A e -E "EP*" )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
+
+
+testOutputComodinesPreguntaSAsterisco() {
+	fixture1
+	esperado=\
+"+--------------+----------+----------+----------+
+|              |    verde | amarillo |     rojo |
++--------------+----------+----------+----------+
+| Elio Stepano |        2 |        2 |        2 |
+|      Totales |        2 |        2 |        2 |
++--------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -E ?S* -A e )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
+
+testOutputComodinesE0Pregunta() {
+	fixture1
+	esperado=\
+"+------------------+----------+----------+----------+
+|                  |    verde | amarillo |     rojo |
++------------------+----------+----------+----------+
+| E03.Elio Stepano |        2 |        2 |        1 |
+|  E01.Elisa Porra |       -- |        1 |       -- |
+| E02.Elio Stepano |       -- |       -- |        1 |
+|          Totales |        2 |        3 |        2 |
++------------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A c e -C "E0?" )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
+testOutputRangoNumero() {
+	fixture1
+	esperado=\
+"+-----------------------+----------+----------+----------+
+|                       |    verde | amarillo |     rojo |
++-----------------------+----------+----------+----------+
+|  1024.E01.Elisa Porra |       -- |        1 |       -- |
+| 1022.E03.Elio Stepano |        1 |       -- |       -- |
+| 1023.E03.Elio Stepano |        1 |       -- |       -- |
+|               Totales |        2 |        1 |       -- |
++-----------------------+----------+----------+----------+"
+	salida=$( $RUN 2>/dev/null -c -A n c e -N 1022 1024 )
+	assertEquals "Salida de reporte  no coincide" "$esperado" "$salida"
+	extraDiff $? "$esperado" "$salida"
+}
+
 
 . shunit2/shunit2
