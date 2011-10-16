@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# COMANDO - FILTROS
-# Filtros posibles:
-#                   -n=<numero> 
-#                   -t=<tipo: A|E|I|SE>
-#                   -s="<string>"
-
-GRUPO="/home/marcelo/Facu/PruebasSO/grupo02"
+################################### MIRARC ##########################################
+#                                                                                   #
+# Uso: mirarC.sh <comando que lo usa> [<filtros>]			            #
+#										    #
+# Filtros posible: -n=<numero de lineas>                                            #
+#                  -t=<tipo de mensaje: I,A,E,SE>                                   #
+#                  -s="<string>"                                                    #
+# Errores: 1-Cantidad erronea de argumentos		 			    #
+#	   2-Archivo de log inexistente                   			    #
+#	   3-Opcion incorrecta                                                      #
+#                                                                                   #
+#####################################################################################
 
 ##### VALIDAR OPCION #####
 validarOpcion () {
@@ -22,12 +27,13 @@ validarOpcion () {
 		nroLineas=`echo "$1" | sed 's/-n=//'`
 		procesarOpcionN $nroLineas
 	else
+		echo "$1"
 		esOpcionS=`echo "$1" | grep '^-s=.*$'`
 		if [ "$esOpcionS" != "" ]; then
 			string=`echo "$1" | sed 's/-s=//'`
-			procesarOpcionS $string
+			procesarOpcionS "$string"
 		else
-			esOpcionT=`echo "$1" | grep '^-t=[I|A|E|SE]$'`
+			esOpcionT=`echo "$1" | grep -E '^-t=(I|A|E|SE)$'`
 			if [ "$esOpcionT" != "" ]; then
 				tipo=`echo "$1" | sed 's/-t=//'`
 				procesarOpcionT $tipo
@@ -56,7 +62,7 @@ procesarOpcionS () {
 
 ##### PROCESAR OPCION T #####
 procesarOpcionT () {
-	grep '^.*-.*-.*- '"$1"'.*$' "$RUTA_LOG.mostrar" >> "$RUTA_LOG.temp"
+	grep '^.* - .* - .* - '"$1"' - .*$' "$RUTA_LOG.mostrar" >> "$RUTA_LOG.temp"
 	rm "$RUTA_LOG.mostrar"
 	mv "$RUTA_LOG.temp" "$RUTA_LOG.mostrar"
 }
@@ -78,7 +84,7 @@ RUTA_LOG="$LOGDIR/$1$LOGEXT"
 #Verificar que exista el archivo de log
 if [ ! -f "$RUTA_LOG" ]; then
 	echo "Archivo de log "$RUTA_LOG" inexistente"
-	exit 1	
+	exit 2	
 fi
 
 if [ $# -eq 1 ]; then
