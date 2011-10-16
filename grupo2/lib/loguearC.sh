@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# COMANDO - TIPO - MENSAJE 
-
-GRUPO="/home/marcelo/Facu/PruebasSO/grupo02"
-
+################################### LOGUEARC ########################################
+#                                                                                   #
+# Uso: loguearC.sh <comando que lo usa> <tipo de mensaje: I,A,E,SE> <mensaje>       #
+#										    #
+# Errores: 1-Cantidad erronea de argumentos.		 			    #
+#	   2-Tipo de mensaje invalido.                  			    #
+#	   3-Mensaje supera el tamaño máximo permitido.                             #
+#                                                                                   #
+#####################################################################################
 
 ##### FLUJO PRINCIPAL #####
 . "$GRUPO/conf/instalarC.conf"
@@ -22,7 +27,7 @@ if [ "$tipo" = "I" -o "$tipo" = "A" -o "$tipo" = "E" -o "$tipo" = "SE" ];then
 	TIPO_MENSAJE="$tipo"
 else
 	echo "Tipo de mensaje "$2" inválido."
-	exit 1
+	exit 2
 fi
 
 NOMBRE_COMANDO=$1
@@ -44,7 +49,7 @@ TAMANIO_MENSAJE=`echo $mensajeALoguear | wc -c` # en bytes
 
 if [ $TAMANIO_MENSAJE -gt `expr $TAMANIO_MAXIMO / 2` ]; then
 	echo "No se pudo loguear el mensaje ya que supera el tamaño máximo permitido."
-	exit 1
+	exit 3
 fi
 
 if [ -e "$RUTA_ARCHIVO" ]; then
