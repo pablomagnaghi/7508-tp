@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl 
 # 
 # 
 #
@@ -19,7 +19,7 @@
 #
 
 use strict;
-use warnings;
+#use warnings;
 
 # adaptado de http://www.perlmonks.org/index.pl?node_id=162876
 my $libpath; 
@@ -385,7 +385,6 @@ chomp;
 				);
 			}
 		}
-		
 	}
 	
 }
