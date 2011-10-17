@@ -57,8 +57,8 @@ else
 		done
 		arch=$(ls $GRUPO/preparados )
 		echo charly dice que $arch
-		if [ arch != "" ]; then
-			echo charly dice que vamos a sumar
+		if [ $arch != "" ]; then
+			echo charly dice que vamos a sumar $arch
 			sumarC.sh
 		fi
 		sleep 10;
