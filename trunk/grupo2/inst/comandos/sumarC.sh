@@ -345,7 +345,7 @@ creará uno vacío para continuar con la ejecución"
 	return 0
 }
 
-# TODO validar que no haya otra instancia corriendo
+# suponemos que no hay otra instancia corriendo <- pasar al informe
 
 paramsError=1
 pregIdError=18
@@ -360,7 +360,7 @@ logAlerta="A"
 logError="E"
 logFatal="SE"
 
-grupo=.
+grupo=$GRUPO
 archMaePreguntas="$grupo/mae/preguntas.mae"
 archMaeEncuestadores="$grupo/mae/encuestadores.mae"
 archMaeEncuestas="$grupo/mae/encuestas.mae"

@@ -78,8 +78,8 @@ if [ -e $DESTINO ];then # si el archivo ya existe
 	DESTINO=$ARCHIVO_DUPLICADO
 fi
 
-cp $ORIGEN $DESTINO
-rm $ORIGEN
+mv $ORIGEN $DESTINO
+
 
 TIPO_MENSAJE="I"
 MENSAJE="Movimiento desde $ORIGEN a $DESTINO exitoso."
