@@ -15,7 +15,6 @@ tar -czf $ACTUAL/grupo2.tgz \
 ./grupo2/inst/comandos/iniciarC.sh \
 ./grupo2/inst/comandos/listarC.pl \
 ./grupo2/inst/comandos/sumarC.sh \
-./grupo2/inst/comandos/run.pl \
 ./grupo2/inst/mae/encuestas.mae \
 ./grupo2/inst/mae/preguntas.mae \
 ./grupo2/inst/mae/encuestadores.mae \
