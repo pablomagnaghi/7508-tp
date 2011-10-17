@@ -16,9 +16,9 @@ else
 	#Ciclo del demonio
 	while [ -e $GRUPO/lib/.data.txt ]; do
 		echo charly dice que hacemos otro loop
+		cd $ARRIDIR
 		for file in $(ls $ARRIDIR ); do
 			if [ -f $file ];then
-				echo $file
 				validName=$(echo $file | grep -i '^[a-z]*\.[0-9]*$')
 				if [ "$validName" != "" ];then
 					userid=$(echo $file | cut -d "." -f 1);
@@ -40,12 +40,10 @@ else
 						fi
 					fi
 				else
-					echo "invalido"
 					$GRUPO/$LIBDIR/moverC.sh $file $GRUPO/rechazados/;
 					$GRUPO/$LIBDIR/loguearC.sh detectarC.sh A "Nombre invalido para ${file}"
 				fi
 			else
-				echo "no regular"
 				$GRUPO/$LIBDIR/moverC.sh $file $GRUPO/rechazados/;
 				$GRUPO/$LIBDIR/loguearC.sh detectarC.sh A "${file} no es un archivo regular"
 			fi
