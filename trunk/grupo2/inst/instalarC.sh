@@ -740,9 +740,10 @@ inicializarVariableGRUPO () {
 actualizarPATH () {
 	grep -q 'ACTUALIZACION DE PATH' ~/.bashrc
 	if [ $? -ne 0 ]; then
-		echo 'PATH=$PATH:'"$1 #ACTUALIZACION DE PATH" >> ~/.bashrc
+		echo 'PATH=$PATH:'"$1:$2 #ACTUALIZACION DE PATH" >> ~/.bashrc
 		loguear 1 "I" "Se actualizó PATH en archivo ~/.bashrc."
 	fi
+
 }
 
 
@@ -788,5 +789,5 @@ moverArchivosMaestrosYEjecutables
 actualizarArchivoConfiguracion
 mostrarMensajeFinInstalacion
 inicializarVariableGRUPO
-actualizarPATH $BINDIR
+actualizarPATH $BINDIR $GRUPO/lib
 exit 0
