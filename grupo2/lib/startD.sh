@@ -1,16 +1,12 @@
 #startD.sh
 
-startD() {
-	#GRUPO="/home/luis/Escritorio/grupo2"
 
 	if [ -e data.txt ]; then
 		#agregar el log
 		echo "demonio corriendo";
-		return 1
+		sleep 3
 	else
-		echo "arrancando demonio";
+		echo "arrancando demonio $GRUPO/bin/detectarC.sh";
 		$GRUPO/bin/detectarC.sh &
-		return 0
+		sleep 3
 	fi;
-
-}
