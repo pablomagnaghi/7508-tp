@@ -8,6 +8,12 @@
 #Si la cantidad de parámetros, exceptuando al cero, es mayor a cero
 #muestro un mensaje de error
 
+
+if [ $0 != 'bash' ]; then
+	echo "Este comando debe invocarse como \". iniciarC.sh\""
+	exit 1
+fi
+
 if [ $# -gt 0 ]; then
 	echo "No pueden existir parametros" >&2
 	exit 1
@@ -148,34 +154,44 @@ export INICIADO=1
 
 #DEMONIO_CORRIENDO=$(ps -ef | grep "$DETECTAR")
 
-DEMONIO_CORRIENDO=$(ps | grep "$DETECTAR")
 
-#Verifico si el demonio esta corriendo
 
-if [ -z "$DEMONIO_CORRIENDO" ]; then
-	echo "cambiando a $LIBDIR para ejecutar $START"
-	cd $LIBDIR
-	. $START
-	echo "Esperando a que $START inicie..."
-	sleep 2
-	if [ $? -ne 0 ]; then
-		echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
-		exit 1
-	else
-		#Busco el número de pid en el archivo data.txt
-		#Hipotesis: este archivo esta en la carpeta actual si startD.sh
-		#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
-		ARCHIVO_PID="data.txt"
-		if [ ! -r $LIBDIR/$ARCHIVO_PID ]; then
-			echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
-			exit 1
-		else
-			PID=$(cat $ARCHIVO_PID)	
-		fi
+ARCHIVO_PID=".data.txt"
+
+# vemos si existe el archivo testigo
+echo charly dice que vamos a ver si existe $LIBDIR/$ARCHIVO_PID
+if [ -r $LIBDIR/$ARCHIVO_PID ]; then
+	
+	PID=$(cat $LIBDIR/$ARCHIVO_PID)
+	echo charly dice que existe un pidfile para el pid $PID
+	# vemos si se esta ejecutando el proceso con el pid del archivo testigo
+	ps ax | grep -q "^$PID "
+	if [ $? -eq 0 ]; then
+		echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
+		return 1
 	fi
+	echo charly dice que no hay problema
+	# el archivo testigo ha quedado de un mal cierre anteriormente
+	rm $LIBDIR/$ARCHIVO_PID
+fi
+
+$LIBDIR/$START
+r=$?
+echo "Esperando a que $LIBDIR/$START inicie..."
+sleep 2
+if [ $r -ne 0 ]; then
+	echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
+	#exit 1
 else
-	echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
-	exit 1
+	#Busco el número de pid en el archivo data.txt
+	#Hipotesis: este archivo esta en la carpeta actual si startD.sh
+	#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
+	if [ ! -r $LIBDIR/$ARCHIVO_PID ]; then
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
+		#exit 1
+	else
+		PID=$(cat $LIBDIR/$ARCHIVO_PID)	
+	fi
 fi
 
 #exporto variables para los comandos sumar y listar
