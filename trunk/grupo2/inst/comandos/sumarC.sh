@@ -319,7 +319,6 @@ ejecución."
 
 	for i in "${archivos[@]}";do
 		if [ ! -f ${i} ]; then
-			echo "putoputoputo" > "archivo"
 			loguear $logAlerta "No se encontro el archivo \"${i}\". Se creará uno \
 vacío para continuar con la ejecución"
 			: > "${i}"
