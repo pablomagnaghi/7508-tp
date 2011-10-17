@@ -200,6 +200,8 @@ ENCUESTAS_SUM="/encuestas.sum"
 export GRUPO
 export ARCHIVO_ENCUESTAS=$GRUPO$YA$ENCUESTAS_SUM
 export DIRECTORIO_YA=$GRUPO$YA
+export DIRECTORIO_LIB=$LIBDIR
+export DIRECTORIO_MAESTROS=$DATAMAE
 
 echo "Inicialización de Ambiente Concluida"
 echo "Ambiente"
