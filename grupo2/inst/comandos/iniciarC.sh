@@ -165,6 +165,7 @@ if [ -r $LIBDIR/$ARCHIVO_PID ]; then
 	PID=$(cat $LIBDIR/$ARCHIVO_PID)
 	echo charly dice que existe un pidfile para el pid $PID
 	# vemos si se esta ejecutando el proceso con el pid del archivo testigo
+	echo 'charly dice que va a ejecutar ps ax | grep -q "^'$PID 
 	ps ax | grep -q "^$PID "
 	if [ $? -eq 0 ]; then
 		echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
