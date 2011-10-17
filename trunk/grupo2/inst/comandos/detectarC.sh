@@ -8,13 +8,16 @@ BINDIR="bin"
 #Escribo el pid de la aplicacion en el archivo .data.txt
 pid=$(ps | grep -m 1 detectarC.sh | awk '{ print $1 }');
 echo $pid > $GRUPO/lib/.data.txt;
+if [ $? -ne 0 ]; then
+	echo No se pudo crear archivo testigo
+else 
+	echo charly dice que esta todo bien
 
 #Ciclo del demonio
-while [ -e .data.txt ]; do
-	cd $ARRIDIR;
-	for file in $(ls); do
-        	if [ -f $file ];then
-
+while [ -e $GRUPO/lib/.data.txt ]; do
+	echo charly dice que hacemos otro loop
+	for file in $(ls $ARRIDIR ); do
+		if [ -f $file ];then
 			validName=$(echo $file | grep -i '^[a-z]*\.[0-9]*$')
 			if [ "$validName" != "" ];then
 			
@@ -47,13 +50,12 @@ while [ -e .data.txt ]; do
 	       	 	./$GRUPO/loguearC.sh detectarC.sh A "${file} no es un archivo regular"
 		fi
 	done
-	cd $GRUPO/preparados/;
-	arch=$(ls -a);
+	arch=$(ls $GRUPO/preparados );
 	if [ arch != "" ]; then	
-		./$GRUPO/$BINDIR/sumarC.sh
+		sumarC.sh
 	fi
 
 	sleep 10;
-	cd $GRUPO;
-
-done	
+done
+echo "saliendo de detectar"	
+fi
