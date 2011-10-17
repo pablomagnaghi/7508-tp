@@ -296,7 +296,7 @@ validarEncuestaRepetida() {
 #                 $archNoEncontrado: En caso de que no exista algun archivo maestro.
 #======================================================================================
 validarDirectoriosYArchivos() {
-	directorios=( $grupo $dirPreparados $dirListos $dirRechazados )
+	directorios=( $GRUPO $dirPreparados $dirListos $dirRechazados )
 
 	for i in "${directorios[@]}";do
 		if [ ! -e ${i} -o ! -d ${i} ]; then
@@ -354,8 +354,6 @@ fi
 
 # TODO validar que no haya otra instancia corriendo
 
-grupo=$GRUPO  # TODO revisar las siguientes lineas
-
 if [ ! -f "$GRUPO/conf/instalarC.conf" ]; then
 	echo "SEVERO - No se ha encontrado el archivo de configuración en \
 $GRUPO/conf/instalarC.conf. Terminando la ejecución"
@@ -379,15 +377,15 @@ Terminando la ejecución"
 	exit $noMover
 fi
 
-archMaePreguntas="$grupo/mae/preguntas.mae"
-archMaeEncuestadores="$grupo/mae/encuestadores.mae"
-archMaeEncuestas="$grupo/mae/encuestas.mae"
-archSumario="$grupo/ya/encuestas.sum"
-archEncuestasRech="$grupo/nolistos/encuestas.rech"
+archMaePreguntas="$GRUPO/mae/preguntas.mae"
+archMaeEncuestadores="$GRUPO/mae/encuestadores.mae"
+archMaeEncuestas="$GRUPO/mae/encuestas.mae"
+archSumario="$GRUPO/ya/encuestas.sum"
+archEncuestasRech="$GRUPO/nolistos/encuestas.rech"
 
-dirPreparados=$grupo"/preparados"
-dirListos=$grupo"/listos"
-dirRechazados=$grupo"/rechazados"
+dirPreparados=$GRUPO"/preparados"
+dirListos=$GRUPO"/listos"
+dirRechazados=$GRUPO"/rechazados"
 
 
 
@@ -442,7 +440,7 @@ al directorio directorio de rechazados."
 	if [ "$?" -eq "$encuestadorIdError" ] ; then
 		loguear $logError "User Id de encuestador incorrecto. Archivo \"$archivo\"\
  rechazado"
-		cat "$grupo"/"$dirPreparados"/"$archivo" >> "$archEncuestasRech"
+		cat "$GRUPO"/"$dirPreparados"/"$archivo" >> "$archEncuestasRech"
 		continue
 	fi
 
