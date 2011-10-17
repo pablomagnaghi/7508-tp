@@ -730,8 +730,8 @@ mostrarMensajeFinInstalacion () {
 
 ########## PONER VARIABLE GRUPO EN profile ##########
 inicializarVariableGRUPO () {
-
-	if [ -z `grep 'GRUPO=' ~/.profile` ];then
+	grep -q 'GRUPO=' ~/.profile
+	if [ $? -ne 0 ]; then
 		echo 'export GRUPO='"$GRUPO" >> ~/.profile
 		loguear 1 "I" "Se agregó variable GRUPO al archivo ~/.profile."
 	fi
