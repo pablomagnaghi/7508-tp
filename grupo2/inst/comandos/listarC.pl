@@ -16,6 +16,7 @@
 
 # Suposiciones:
 # encuestas.sum esta bien formado y es válido
+# los maestros están bien formados
 #
 
 use strict;

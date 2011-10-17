@@ -725,6 +725,7 @@ mostrarMensajeFinInstalacion () {
 	detectarPaqueteInstalado 
 	loguear 2 "I" "* FIN del Proceso de Instalación Copyright SisOp (c)2011*"
 	loguear 2 "I" "*********************************************************"
+	loguear 2 "I" "DEBE REINICIAR SESION O ABRIR OTRA TERMINAL PARA QUE LOS CAMBIOS SE HAGAN EFECTIVOS"
 }
 
 ########## PONER VARIABLE GRUPO EN BASHRC ##########
@@ -732,10 +733,18 @@ inicializarVariableGRUPO () {
 
 	if [ -z `grep 'GRUPO=' ~/.bashrc` ];then
 		echo 'GRUPO='"$GRUPO" >> ~/.bashrc
-		bash
 		loguear 1 "I" "Se agregó variable GRUPO al archivo ~/.bashrc."
 	fi
 }
+
+actualizarPATH () {
+	grep -q 'ACTUALIZACION DE PATH' ~/.bashrc
+	if [ $? -ne 0 ]; then
+		echo 'PATH=$PATH:'"$1 #ACTUALIZACION DE PATH" >> ~/.bashrc
+		loguear 1 "I" "Se actualizó PATH en archivo ~/.bashrc."
+	fi
+}
+
 
 ########## FLUJO DE EJECUCIÓN ##########
 loguear 1 "I" "Inicio de Ejecución"
@@ -779,4 +788,5 @@ moverArchivosMaestrosYEjecutables
 actualizarArchivoConfiguracion
 mostrarMensajeFinInstalacion
 inicializarVariableGRUPO
+actualizarPATH $BINDIR
 exit 0
