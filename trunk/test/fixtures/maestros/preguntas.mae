@@ -1,10 +1,10 @@
-110,Posee numero de cuit,+,ALTA
+110,Posee Numero de CUIT,+,ALTA
 111,Quiere contratar servicios premium,+,ALTA
 120,Tiene domicilio en capital,+,MEDIA
-121,Quiere contratar servicios estandar,+,MEDIA
+121,Quiere contratar servicios estandard,+,MEDIA
 130,Es un referido,+,BAJA
-131,Usa habitualmente el debito automatico,+,ALTA
-210,Tiene deuda atrasada de mas de tres meses,-,ALTA
+131,Usa habitualmente el debito automatico,+,BAJA
+210,Tiene deuda atrasada en mas de 3 meses,-,ALTA
 211,Tiene accion judicial pendiente,-,ALTA
 220,Cambia regularmente de proveedor,-,MEDIA
 221,No posee referencias,-,MEDIA

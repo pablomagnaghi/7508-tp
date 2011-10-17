@@ -10,14 +10,13 @@ export DIRECTORIO_LIB=$GRUPO/grupo2/lib
 
 
 fixture1() {
-	export DIRECTORIO_MAESTROS=$GRUPO/grupo2/inst/mae
-	export DIRECTORIO_YA=$GRUPO/test/fixtures
+	export DIRECTORIO_MAESTROS=$GRUPO/test/fixtures/maestros
+	export DIRECTORIO_YA=$GRUPO/test/fixtures/ya
 	export ARCHIVO_ENCUESTAS=$DIRECTORIO_YA/encuestas.sum
+	export LIMPIAR="$DIRECTORIO_YA"'/reporte*'
 }
 
 RUN="../grupo2/inst/comandos/listarC.pl"
-LIMPIAR="$DIRECTORIO_YA"'/reporte* salida.txt esperado.txt'
-
 
 
 extraDiff() {
@@ -32,9 +31,20 @@ extraDiff() {
 }
 
 oneTimeTearDown() {
-	rm -f $LIMPIAR
+	fixture1
+	rm  -r $LIMPIAR
 }
 
+testEntorno() {
+	fixture1
+	echo "GRUPO               : $GRUPO"
+	echo "DIRECTORIO_YA       : $DIRECTORIO_YA"
+	echo "DIRECTORIO_LIB      : $DIRECTORIO_LIB"
+	echo "DIRECTORIO_MAESTROS : $DIRECTORIO_MAESTROS" 
+	echo "ARCHIVO_ENCUESTAS   : $ARCHIVO_ENCUESTAS"
+	echo "RUN                 : $RUN"
+	echo "LIMPIAR             : $LIMPIAR"
+}
 
 testExitNoSalida() {
 	$RUN > /dev/null 2>&1

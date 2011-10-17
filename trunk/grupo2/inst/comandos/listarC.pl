@@ -260,6 +260,7 @@ chomp;
 		$registro{'modalidad'},
 		$registro{'persona'}
 	) = split(/,/);
+	chomp $persona;
 
 # +Encuestador: key de %encuestadores
 # |        +Fecha:NO INTERESA

@@ -120,6 +120,7 @@ sub cargar_encuestas($) {
 			$registro{"verde_inicio"},
 			$registro{"verde_fin"}
 		) = split(/,/);
+		chomp %registro;
 
 		$lista{$registro{"codigo"}}=\%registro;
 	}
@@ -227,7 +228,7 @@ sub cargar_encuestadores($) {
 			$registro{"desde"},
 			$registro{"hasta"}
 		) = split(/,/);
-
+		chomp %registro;
 		$lista{$registro{"id"}}=\%registro;
 	}
 	close(ARCHIVO);
@@ -263,7 +264,7 @@ sub cargar_preguntas($){
 			$registro{"tipo"},
 			$registro{"ponderacion"}
 		) = split(/,/);
-
+		chomp %registro;
 		$lista{$registro{"id"}}=\%registro;
 	}
 	close(ARCHIVO);
