@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #Inicializo variables
-GRUPO="/home/luis/Escritorio/grupo2"
 ARRIDIR="$GRUPO/arribos"
 LIBDIR="lib"
 BINDIR="bin"
@@ -11,11 +10,9 @@ pid=$(ps | grep -m 1 detectarC.sh | awk '{ print $1 }');
 echo $pid > $GRUPO/lib/.data.txt;
 
 #Ciclo del demonio
-while [ -e .data.txt ] 
-do
+while [ -e .data.txt ]; do
 	cd $ARRIDIR;
-	for file in $(ls);
-	do
+	for file in $(ls); do
         	if [ -f $file ];then
 
 			validName=$(echo $file | grep -i '^[a-z]*\.[0-9]*$')
