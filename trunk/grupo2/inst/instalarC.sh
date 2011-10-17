@@ -728,20 +728,20 @@ mostrarMensajeFinInstalacion () {
 	loguear 2 "I" "DEBE REINICIAR SESION O ABRIR OTRA TERMINAL PARA QUE LOS CAMBIOS SE HAGAN EFECTIVOS"
 }
 
-########## PONER VARIABLE GRUPO EN profile ##########
+########## PONER VARIABLE GRUPO EN bashrc ##########
 inicializarVariableGRUPO () {
-	grep -q 'GRUPO=' ~/.profile
+	grep -q 'GRUPO=' ~/.bashrc
 	if [ $? -ne 0 ]; then
-		echo 'export GRUPO='"$GRUPO" >> ~/.profile
-		loguear 1 "I" "Se agregó variable GRUPO al archivo ~/.profile."
+		echo 'export GRUPO='"$GRUPO" >> ~/.bashrc
+		loguear 1 "I" "Se agregó variable GRUPO al archivo ~/.bashrc."
 	fi
 }
 
 actualizarPATH () {
-	grep -q 'ACTUALIZACION DE PATH' ~/.profile
+	grep -q 'ACTUALIZACION DE PATH' ~/.bashrc
 	if [ $? -ne 0 ]; then
-		echo 'PATH=$PATH:'"$1 #ACTUALIZACION DE PATH" >> ~/.profile
-		loguear 1 "I" "Se actualizó PATH en archivo ~/.profile."
+		echo 'PATH=$PATH:'"$1 #ACTUALIZACION DE PATH" >> ~/.bashrc
+		loguear 1 "I" "Se actualizó PATH en archivo ~/.bashrc."
 	fi
 }
 
