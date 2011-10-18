@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Inicializo variables
+
 ARCHIVO_CONF="$GRUPO/conf/instalarC.conf"
 
 . $ARCHIVO_CONF
@@ -11,6 +13,7 @@ if [ $? -ne 0 ]; then
 	loguearC.sh detectarC SE "No se pudo crear el archivo testigo para ejecutar detectarC.sh"
 else 
 	loguearC.sh detectarC I "Arrancando demonio"
+
 
 	#Ciclo del demonio
 	while [ -e $LIBDIR/.data.txt ]; do
@@ -60,3 +63,5 @@ else
 	done
 	loguearC.sh detectarC I "Terminando detectar.."
 fi
+
+
