@@ -9,7 +9,9 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-tar -czf $ACTUAL/grupo2.tgz \
+chmod 755 ./grupo2/inst/instalarC.sh
+
+tar -pczf $ACTUAL/grupo2.tgz \
 ./grupo2/inst/instalarC.sh \
 ./grupo2/inst/comandos/detectarC.sh \
 ./grupo2/inst/comandos/iniciarC.sh \

@@ -155,37 +155,37 @@ detectarPaqueteInstalado () {
 		if [ -f $BINDIR/iniciarC.sh ]; then
 			fechaInst=`cat "$GRUPO/conf/instalarC.conf" | grep INICIARF | sed 's/INICIARF=//'`
 			usrInst=`cat "$GRUPO/conf/instalarC.conf" | grep INICIARU | sed 's/INICIARU=//'`
-			instalados=$instalados"* iniciarC.sh\t$fechaInst\t$usrInst\t\t*+"
+			instalados=$instalados"* iniciarC.sh $fechaInst $usrInst   +"
 			INICIARC_INSTALADO="1"
 		else
-			noInstalados="* $noInstalados* iniciarC.sh\t\t\t\t\t\t*+"
+			noInstalados="* $noInstalados* iniciarC.sh       +"
 			INICIARC_INSTALADO="0"
 		fi
 		if [ -f $BINDIR/detectarC.sh ]; then
 			fechaInst=`cat "$GRUPO/conf/instalarC.conf" | grep DETECTARF | sed 's/DETECTARF=//'`
 			usrInst=`cat "$GRUPO/conf/instalarC.conf" | grep DETECTARU | sed 's/DETECTARU=//'`
-			instalados=$instalados"* detectarC.sh\t$fechaInst\t$usrInst\t\t*+"
+			instalados=$instalados"* detectarC.sh $fechaInst $usrInst   +"
 			DETECTARC_INSTALADO="1"
 		else
-			noInstalados="$noInstalados* detectarC.sh\t\t\t\t\t\t*+"
+			noInstalados="$noInstalados* detectarC.sh       +"
 			DETECTARC_INSTALADO="0"
 		fi
 		if [ -f $BINDIR/sumarC.sh ]; then
 			fechaInst=`cat "$GRUPO/conf/instalarC.conf" | grep SUMARF | sed 's/SUMARF=//'`
 			usrInst=`cat "$GRUPO/conf/instalarC.conf" | grep SUMARU | sed 's/SUMARU=//'`
-			instalados=$instalados"* sumarC.sh\t$fechaInst\t$usrInst\t\t*+"
+			instalados=$instalados"* sumarC.sh $fechaInst $usrInst   +"
 			SUMARC_INSTALADO="1"
 		else
-			noInstalados="$noInstalados* sumarC.sh\t\t\t\t\t\t*+"
+			noInstalados="$noInstalados* sumarC.sh       +"
 			SUMARC_INSTALDO="0"
 		fi
 		if [ -f $BINDIR/listarC.pl ]; then
 			fechaInst=`cat "$GRUPO/conf/instalarC.conf" | grep LISTARF | sed 's/LISTARF=//'`
 			usrInst=`cat "$GRUPO/conf/instalarC.conf" | grep LISTARU | sed 's/LISTARU=//'`
-			instalados=$instalados"* listarC.pl\t$fechaInst\t$usrInst\t\t*+"
+			instalados=$instalados"* listarC.pl $fechaInst $usrInst   +"
 			LISTARC_INSTALADO="1"
 		else
-			noInstalados="$noInstalados* listarC.pl\t\t\t\t\t\t*+"
+			noInstalados="$noInstalados* listarC.pl       +"
 			LISTARC_INSTALADO="0"
 		fi
 
