@@ -6,13 +6,14 @@
 #
 # USO: sumarC.sh
 #
-# CÓD ERROR: 0: Ejecución exitosa
-#            1: Variable GRUPO o LIBDIR no inicializada
-#            2: Script loguearC no encontrado
-#            3: Script moverC no encontrado
-#            4: Directorio no encontrado (Ver log por más detalles)
-#            5: Archivo no encontrado (Ver log por más detalles)
-#            6: Error al ejecutar comando moverC
+# CÓD ERROR: 0: Ejecución exitosa.
+#            1: Variable GRUPO o LIBDIR no inicializada.
+#            2: Script loguearC no encontrado.
+#            3: Script moverC no encontrado.
+#            4: Directorio no encontrado (Ver log por más detalles).
+#            5: Archivo no encontrado (Ver log por más detalles).
+#            6: Error al ejecutar comando moverC.
+#            7: Existe otra instancia de sumarC corriendo.
 #======================================================================================
 
 
@@ -28,7 +29,8 @@ loguear() {
 	$logcmd "sumarC" "$1" "$2"
 	errorCode=$?
 	if [ $errorCode -ne "0" ]; then
-		echo "SumarC - E - Hubo un error al invocar al logger. El código es: \"$?\". Los parametros con los que se invoco fueron \$1:\"$1\" y \$2:\"$2\"" # TODO borrar linea
+		echo "SumarC - E - Hubo un error al invocar al logger. El código es: \"$?\". \
+Los parametros con los que se invoco fueron Comando: sumarC Tipo:\"$1\" Mensaje:\"$2\""
 	fi
 	return $errorCode
 }
@@ -52,7 +54,7 @@ mover() {
 #
 # PRE-CONDICIÓN:  El registro 'pregunta' que recibe esta correctamente formateado según 
 #                 el enunciado del TP.
-# POST-CONDICIÓN: Emite por stdout el factor numérico de ponderacion. Ej "-2","+1",etc
+# POST-CONDICIÓN: Emite por stdout el factor numérico de ponderacion. Ej "-2","1",etc
 #
 # PARÁMETRO 1:    Registro 'pregunta'.
 # 
@@ -62,12 +64,16 @@ obtenerPonderacion() {
 	tipoPregunta=`echo $1 | cut -d $sc -f 3`
 	ponderacion=`echo $1 | cut -d $sc -f 4`
 	case "$ponderacion" in
-		ALTA) ponderacionNum="3" ;;
-		MEDIA) ponderacionNum="2" ;;
-		BAJA) ponderacionNum="1" ;;
+		"ALTA"  ) ponderacionNum="3" ;;
+		"MEDIA" ) ponderacionNum="2" ;;
+		"BAJA" ) ponderacionNum="1" ;;
 	esac
 
-	echo "$tipoPregunta""$ponderacionNum"
+	if [ $tipoPregunta == "+" ]; then
+		echo "$ponderacionNum"
+	else
+		echo "$tipoPregunta""$ponderacionNum"
+	fi
 	return 0
 }
 
@@ -100,6 +106,8 @@ obtenerPuntaje() {
 	if [ "$aux" -gt "${#preguntas[@]}" ] ; then
 		return $pregIdError
 	fi
+
+	let "aux -= 1"
 
 	ponderacion=`obtenerPonderacion ${preguntas[$aux]}`
 	respuesta=$2
@@ -280,10 +288,8 @@ validarEncuestaRepetida() {
 	done
 
 	if [ "${#sumarioEncuestas[@]}" -eq "0" -o "$aux" -gt "${#sumarioEncuestas[@]}" ] ; then
-		echo "La encuesta nro:\"$1\ es valida!" >> "/home/maxi/Escritorio/SSOO/grupo2/bin/archivo"
 		echo "0"
 	else 
-		echo "La encuesta nro:\"$1\ no es valida!" >> "/home/maxi/Escritorio/SSOO/grupo2/bin/archivo"
 		echo "$errorEncRepetida"
 	fi
 	return 0
@@ -344,6 +350,7 @@ noMover=3
 dirNoEncontrado=4
 archNoEncontrado=5
 moverError=6
+sumarCorriendoError=7
 paramsError=7
 errorEncRepetida=17
 pregIdError=18
@@ -354,8 +361,6 @@ logInfo="I"
 logAlerta="A"
 logError="E"
 logFatal="SE"
-
-# TODO validar que no haya otra instancia corriendo
 
 logcmd="$LIBDIR/loguearC.sh"
 movercmd="$LIBDIR/moverC.sh"
@@ -371,12 +376,11 @@ dirListos=$GRUPO"/listos"
 dirRechazados=$GRUPO"/rechazados"
 
 ############################### Validación del entorno ################################
-
 variables=( GRUPO LIBDIR )
 
 for i in "${variables[@]}"; do
 	if [ ! ${!i} ]; then
-		echo "SEVERO - La variable \${i} no ha sido inicializada. Abortando la \
+		echo "SEVERO - La variable ${i} no ha sido inicializada. Abortando la \
 ejecución"
 		exit $noVarReq
 	fi
@@ -399,6 +403,24 @@ ambienteValido=$?
 if [ $ambienteValido -ne 0 ] ; then
 	exit $ambienteValido
 fi
+
+###################### Checkeo si hay otra instancia corriendo ########################
+archivoPid="$LIBDIR/.sumarC.pid"
+
+if [ -e $archivoPid ]; then
+	pid=$(cat $archivoPid)
+	
+	if [ `ps ax | grep -c "^[ ]*$pid "` -ne 0 ]; then
+		loguear $logFatal "Existe otra instancia de sumarC ejecutándose actualmente. \
+Esta ejecución será abortada."
+		exit $sumarCorriendoError
+	fi
+	rm $archivoPid
+fi
+
+pid=$(ps | grep -m 1 sumarC.sh | awk '{ print $1 }');
+echo $pid > $archivoPid; # Si no hay otra instancia, guardo el pid de ésta.
+
 
 
 origIfs=$IFS
@@ -573,5 +595,6 @@ loguear $logInfo "Ha finalizado el procesamiento de archivos del directorio: \
 \"$dirPreparados\""
 
 IFS=$origIfs
+rm $archivoPid
 
 exit 0
