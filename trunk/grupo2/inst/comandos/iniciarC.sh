@@ -21,6 +21,12 @@ fi
 
 #VERIFICO LA EXISTENCIA DEL ARCHIVO DE CONFIGURACION
 
+if [ -z $GRUPO ]; then
+	echo "Inicialización de ambiente no fue exitosa. No Ha sido seteada la variable \$GRUPO"
+	exit 1
+fi
+
+
 ARCHIVO_CONF="$GRUPO/conf/instalarC.conf"
 
 if [ ! -f $ARCHIVO_CONF ]; then
@@ -117,7 +123,7 @@ for i in "${ARCHIVOS[@]}";do
 	fi
 done
 
-#$LOGUEAR iniciarC I "Se han seteado las variables"
+$LOGUEAR iniciarC I "Se han seteado las variables"
 echo "Se han seteado las variables"
 
 #Verifico existencia de los archivos maestros
@@ -130,7 +136,7 @@ ARCHIVOS=( ENCUESTAS PREGUNTAS ENCUESTADORES )
 
 for i in "${ARCHIVOS[@]}";do
 	if [ ! -r ${DATAMAE}/${!i} ]; then
-		#$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. No existe archivo ${$DATAMAE}/${!i} o no tiene permiso de lectura"
+		$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. No existe archivo ${$DATAMAE}/${!i} o no tiene permiso de lectura"
 		echo "Inicialización de ambiente no fue exitosa. No existe archivo ${$DATAMAE}/${!i} o no tiene permiso de lectura"
 		exit 1
 	fi
@@ -154,7 +160,7 @@ if [ -r $LIBDIR/$ARCHIVO_PID ]; then
 	
 	ps ax | grep -q "$PID "
 	if [ $? -eq 0 ]; then
-		#$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
+		$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
 		echo "Inicialización de ambiente no fue exitosa. El comando $DETECTAR se encuentra corriendo"
 		exit 1
 	fi
@@ -164,13 +170,13 @@ fi
 $LIBDIR/$START
 r=$?
 
-#$LOGUEAR iniciarC I "Esperando a que $LIBDIR/$START inicie..."
+$LOGUEAR iniciarC I "Esperando a que $LIBDIR/$START inicie..."
 echo "Esperando a que $LIBDIR/$START inicie..."
 
 sleep 2
 
 if [ $r -ne 0 ]; then
-	#$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
+	$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
 	echo "Inicialización de ambiente no fue exitosa. Error al ejecutar el comando ${START}"
 	#exit 1
 else
@@ -179,6 +185,7 @@ else
 	#fue ejecutado exitosamente, data.txt solo contienen el número del proceso
 	if [ ! -r $LIBDIR/$ARCHIVO_PID ]; then
 		$LOGUEAR iniciarC SE "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
+		echo "Inicialización de ambiente no fue exitosa. No existe archivo $LIBDIR/${ARCHIVO_PID} o no tiene permiso de lectura"
 		#exit 1
 	else
 		PID=$(cat $LIBDIR/$ARCHIVO_PID)	
@@ -205,8 +212,14 @@ echo "Demonio corriendo bajo el Nro.: <$PID>"
 
 
 #escribo en log
-#$LOGUEAR iniciarC I "Inicialización de Ambiente Concluida"
-#$LOGUEAR iniciarC I "Demonio corriendo bajo el Nro.: <$PID>"
+$LOGUEAR iniciarC I "Inicialización de Ambiente Concluida"
+$LOGUEAR iniciarC I "Ambiente"
+
+for i in "${VARIABLES[@]}";do
+	$LOGUEAR iniciarC I "$i=${!i}"
+done
+
+$LOGUEAR iniciarC I "Demonio corriendo bajo el Nro.: <$PID>"
 
 sleep 5
 
