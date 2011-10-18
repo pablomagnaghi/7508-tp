@@ -15,6 +15,7 @@ if [ $# -lt 2 ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Faltan argumentos. Uso: mover <origen> <destino> [<comando que invoca>]."
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
+	echo "moverC: $MENSAJE" >&2
 	exit 1
 fi
 
@@ -22,6 +23,7 @@ if [ $# -gt 3 ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Sobran argumentos. Uso: mover <origen> <destino> [<comando que invoca>]."	
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"	
+	echo "moverC: $MENSAJE" >&2
 	exit 1
 fi
 
@@ -34,6 +36,7 @@ if [ ! -e $ORIGEN ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Archivo origen $ORIGEN inexistente."
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
+	echo "moverC: $MENSAJE" >&2
 	exit 2
 fi
 
@@ -41,6 +44,7 @@ if [ ! -r $ORIGEN -o  ! -w $ORIGEN ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Archivo origen $ORIGEN sin permisos."
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
+	echo "moverC: $MENSAJE" >&2
 	exit 3
 fi
 
@@ -48,6 +52,7 @@ if [ ! -d $DESTINO ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Directorio destino $DESTINO inexistente"
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
+	echo "moverC: $MENSAJE" >&2
 	exit 2
 fi
 
@@ -55,6 +60,7 @@ if [ ! -r $DESTINO -o  ! -w $DESTINO ];then
 	TIPO_MENSAJE="SE"
 	MENSAJE="Directorio destino $DESTINO sin permisos."
 	$GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
+	echo "moverC: $MENSAJE" >&2
 	exit 3
 fi
 
@@ -88,7 +94,6 @@ $GRUPO/lib/loguearC.sh "moverC" "$TIPO_MENSAJE" "$MENSAJE"
 if [ $# -eq 3 ];then
 	MENSAJE="Movimiento desde $ORIGEN a $DESTINO exitoso a traves de moverC."
 	COMANDO_INVOCANTE="$3"
-	echo "$MENSAJE"
 	$GRUPO/lib/loguearC.sh "$3" "$TIPO_MENSAJE" "$MENSAJE"
 fi
 

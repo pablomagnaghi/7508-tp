@@ -15,7 +15,7 @@
 
 # Verifico cantidad de parametros:
 if [ $# != 3 ]; then
-	echo "Cantidad de parámetros inválida."
+	echo "loguearC: Cantidad de parámetros inválida." >&2
 	exit 1
 fi
 
@@ -26,7 +26,7 @@ tipo="`echo $2 | tr "[:lower:]" "[:upper:]"`"
 if [ "$tipo" = "I" -o "$tipo" = "A" -o "$tipo" = "E" -o "$tipo" = "SE" ];then
 	TIPO_MENSAJE="$tipo"
 else
-	echo "Tipo de mensaje "$2" inválido."
+	echo "loguearC: Tipo de mensaje "$2" inválido." >&2
 	exit 2
 fi
 
@@ -48,7 +48,7 @@ mensajeALoguear="$FECHA_HORA - $NOMBRE_USUARIO - $NOMBRE_COMANDO - $TIPO_MENSAJE
 TAMANIO_MENSAJE=`echo $mensajeALoguear | wc -c` # en bytes
 
 if [ $TAMANIO_MENSAJE -gt `expr $TAMANIO_MAXIMO / 2` ]; then
-	echo "No se pudo loguear el mensaje ya que supera el tamaño máximo permitido."
+	echo "loguearC: No se pudo loguear el mensaje ya que supera el tamaño máximo permitido." >&2
 	exit 3
 fi
 
@@ -79,7 +79,7 @@ if [ -e "$RUTA_ARCHIVO" ]; then
 
 		FECHA_HORA=`date "+%d/%m/%Y-%H:%M:%S"`
 		mensajeALoguear="$FECHA_HORA - $NOMBRE_USUARIO - $NOMBRE_COMANDO - A - Log excedido."	
-		echo "Log excedido."
+		echo "loguearC: Log excedido." >&2
 		echo "$mensajeALoguear" >> "$RUTA_ARCHIVO"
 	fi
 fi
