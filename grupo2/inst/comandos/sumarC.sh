@@ -344,6 +344,34 @@ vacío para continuar con la ejecución"
 	return 0
 }
 
+#=== FUNCIÓN ==========================================================================
+# DESCRIPCIÓN:    Valida el codigo de encuesta.
+#
+# PRE-CONDICIÓN:  
+# POST-CONDICIÓN: 
+#
+# PARÁMETROS:     
+# 
+# VALOR RETORNO:  0: En todos los casos.
+#======================================================================================
+validarCodigoEncuesta() {
+	aux=0
+
+	while [[ "$aux" -le "${#encuestas[@]}" && \
+"`echo "${encuestas[$aux]}" | cut -d "${sc}" -f 1`" != "$1" ]] ; do
+
+		let "aux += 1"
+	done
+	
+	if [ $aux -gt "${#encuestas[@]}" ]; then
+		echo "1"
+	else
+		echo "0"
+	fi
+
+	return 0	
+}
+
 noVarReq=1
 noLogger=2
 noMover=3
@@ -491,7 +519,7 @@ rechazado"
 				loguear $logError "Formato de cabecera incorrecto, rechazando \
 encuesta. Archivo \"$archivo\", línea número $nroLineaActual"
 				desecharBloque "$nroLineaActual" "nroLineaActual" \
-                                >> "$archEncuestasRech"
+>> "$archEncuestasRech"
 			fi
 		done
 
@@ -527,6 +555,12 @@ Archivo \"$archivo\""
 
 			loguear $logError "Falta de registro detalle. La encuesta número \
 \"$nroEncuesta\" perteneciente al archivo \"$archivo\" será rechazada."
+			desecharBloque="true"
+
+		elif [ `validarCodigoEncuesta $codEncuesta` -ne "0" ]; then
+
+			loguear $logError "No se reconoce a $codEncuesta como un código de encuesta\
+ válido. La encuesta $nroEncuesta, del archivo $archivo será rechazada."
 			desecharBloque="true"
 
 		elif [ `validarNumeroEncuesta "$nroLineaActual" "$nroEncuesta"`\
