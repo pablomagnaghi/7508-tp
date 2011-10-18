@@ -5,39 +5,45 @@
 # ARCHIVO: sumarC.sh
 #
 # USO: sumarC.sh
+#
+# CÓD ERROR: 0: Ejecución exitosa
+#            1: Variable GRUPO o LIBDIR no inicializada
+#            2: Script loguearC no encontrado
+#            3: Script moverC no encontrado
+#            4: Directorio no encontrado (Ver log por más detalles)
+#            5: Archivo no encontrado (Ver log por más detalles)
+#            6: Error al ejecutar comando moverC
 #======================================================================================
 
 
 #=== FUNCIÓN ==========================================================================
-# DESCRIPCIÓN:    #TODO
-#
-# PRE-CONDICIÓN:  
-# POST-CONDICIÓN: 
+# DESCRIPCIÓN:    Invoca al comando loguearC
 #
 # PARÁMETRO 1:    Tipo.
 # PARÁMETRO 2:    Mensaje.
 # 
-# VALOR RETORNO:  0: Éxito
+# VALOR RETORNO:  Retorna el valor que devuelve loguearC
 #======================================================================================
 loguear() {
-	$logcmd sumarC.sh $1 $2
-	return 0
+	$logcmd "sumarC" "$1" "$2"
+	errorCode=$?
+	if [ $errorCode -ne "0" ]; then
+		echo "SumarC - E - Hubo un error al invocar al logger. El código es: \"$?\". Los parametros con los que se invoco fueron \$1:\"$1\" y \$2:\"$2\"" # TODO borrar linea
+	fi
+	return $errorCode
 }
 
 #=== FUNCIÓN ==========================================================================
-# DESCRIPCIÓN:    #TODO
+# DESCRIPCIÓN:    Invoca al comando moverC
 #
-# PRE-CONDICIÓN:  
-# POST-CONDICIÓN: 
-#
-# PARÁMETRO 1:    Tipo.
-# PARÁMETRO 2:    Mensaje.
+# PARÁMETRO 1:    Archivo origen.
+# PARÁMETRO 2:    Directorio destino.
 # 
-# VALOR RETORNO:  0: Éxito
+# VALOR RETORNO:  Retorna el valor que devuelve moverC
 #======================================================================================
 mover() {
 	$movercmd "$1" "$2"
-	return 0
+	return $?
 }
 
 #=== FUNCIÓN ==========================================================================
@@ -85,13 +91,13 @@ obtenerPuntaje() {
 	fi
 
 	pregId=0
-	aux=-1
-	while [ "$pregId" -ne "$1" -a "$aux" -le "${#preguntas[@]}" ] ; do
+	aux=0
+	while [ "$pregId" != "$1" -a "$aux" -le "${#preguntas[@]}" ] ; do
+		pregId=`echo ${preguntas[$aux]} | cut -d ${sc} -f 1`
 		let "aux += 1"
-		pregId=`echo ${preguntas[$aux]} | cut -d $sc -f 1`
 	done
 	
-	if [ "$pregId" -ne "$1" ] ; then
+	if [ "$aux" -gt "${#preguntas[@]}" ] ; then
 		return $pregIdError
 	fi
 
@@ -146,8 +152,7 @@ obtenerCantPreguntas() {
 #                 encuestas que se esta procesando.
 # POST-CONDICIÓN: Emite por stdout el bloque Cabecera-n*Detalles que se quiere 
 #                 desechar, comenzando por la linea que se recibe como primer parámetro
-#                 hasta llegar a una linea que no cumpla con la expresión regular
-#                 almacenada en la variable 'regexDetalleSimple'
+#                 hasta llegar a una linea que cumpla con la expresión regular "^C,.*$"
 #                 Almacena en la variable ${!$2} el valor de la primer línea del 
 #                 siguiente bloque.
 #
@@ -167,7 +172,7 @@ desecharBloque() {
 	fi
 
 	while [ "$aux" -le "${#lineas[@]}" -a \
-            `echo "${lineas[$aux]}" | grep -E -c "$regexDetalleSimple"` -eq "1" ] ; do
+            		`echo "${lineas[$aux]}" | grep -E -c "^C,.*$"` -ne "1" ] ; do
 		echo "${lineas[$aux]}"
 		let "aux += 1"
 	done
@@ -221,7 +226,7 @@ validarUserId() {
 validarCantidadPreguntas() {
 	aux="$1"
 	while [ "$aux" -le "${#lineas[@]}" -a  \
-            `echo "${lineas[$aux]}" | grep -E -c "$regexDetalleSimple"` -eq "1" ] ; do
+            `echo "${lineas[$aux]}" | grep -E -c "$regexDetalle"` -eq "1" ] ; do
 		let "aux += 1"
 	done
 	echo "$(($aux - $1 - $2))"
@@ -267,14 +272,18 @@ validarNumeroEncuesta() {
 validarEncuestaRepetida() {
 	aux=0
 	sumarioEncuestas=($(cat "$archSumario"))
+
 	while [[ "$aux" -le "${#sumarioEncuestas[@]}" && \
-"`echo "${sumarioEncuestas[$aux]}" | cut -d "$sc" -f 3`" == "$1" ]] ; do
+"`echo "${sumarioEncuestas[$aux]}" | cut -d "${sc}" -f 3`" != "$1" ]] ; do
+
 		let "aux += 1"
 	done
 
-	if [ "$aux" -eq "0" -o "$aux" -gt "${#sumarioEncuestas[@]}" ] ; then 
+	if [ "${#sumarioEncuestas[@]}" -eq "0" -o "$aux" -gt "${#sumarioEncuestas[@]}" ] ; then
+		echo "La encuesta nro:\"$1\ es valida!" >> "/home/maxi/Escritorio/SSOO/grupo2/bin/archivo"
 		echo "0"
 	else 
+		echo "La encuesta nro:\"$1\ no es valida!" >> "/home/maxi/Escritorio/SSOO/grupo2/bin/archivo"
 		echo "$errorEncRepetida"
 	fi
 	return 0
@@ -300,7 +309,8 @@ validarDirectoriosYArchivos() {
 
 	for i in "${directorios[@]}";do
 		if [ ! -e ${i} -o ! -d ${i} ]; then
-			loguear $logFatal "No existe el directorio: \"${i}\". Terminando la ejecución."
+			loguear $logFatal "No existe el directorio: \"${i}\". Abortando \
+la ejecución."
 			return $dirNoEncontrado
 		fi
 	done
@@ -309,7 +319,7 @@ validarDirectoriosYArchivos() {
 
 	for i in "${maestros[@]}";do
 		if [ ! -f ${i} ]; then
-			loguear $logFatal "No existe el archivo maestro: \"${i}\". Terminando la \
+			loguear $logFatal "No existe el archivo maestro: \"${i}\". Abortando la \
 ejecución."
 			return $archNoEncontrado
 		fi
@@ -328,14 +338,14 @@ vacío para continuar con la ejecución"
 	return 0
 }
 
-paramsError=1
-noGrupoVar=2
-noConfigFile=3
-noLogger=4
-noMover=5
-dirNoEncontrado=6
-archNoEncontrado=7
-errorEncRepetida=10
+noVarReq=1
+noLogger=2
+noMover=3
+dirNoEncontrado=4
+archNoEncontrado=5
+moverError=6
+paramsError=7
+errorEncRepetida=17
 pregIdError=18
 encuestaIdError=19
 encuestadorIdError=20
@@ -345,36 +355,10 @@ logAlerta="A"
 logError="E"
 logFatal="SE"
 
-if [ ! $GRUPO ]; then
-	echo "SEVERO - La variable \$GRUPO no ha sido inicializada. Terminando la \
-ejecución"
-	exit $noGrupoVar
-fi
-
 # TODO validar que no haya otra instancia corriendo
-
-if [ ! -f "$GRUPO/conf/instalarC.conf" ]; then
-	echo "SEVERO - No se ha encontrado el archivo de configuración en \
-$GRUPO/conf/instalarC.conf. Terminando la ejecución"
-	exit $noConfigFile
-fi
-
-. "$GRUPO/conf/instalarC.conf"
 
 logcmd="$LIBDIR/loguearC.sh"
 movercmd="$LIBDIR/moverC.sh"
-
-if [ ! -f "$logcmd" ]; then
-	echo "SEVERO - No se ha encontrado el script para loguear \"$logcmd\". \
-Terminando la ejecución"
-	exit $noLogger
-fi
-
-if [ ! -f "$movercmd" ]; then
-	echo "SEVERO - No se ha encontrado el script para loguear \"$movercmd\". \
-Terminando la ejecución"
-	exit $noMover
-fi
 
 archMaePreguntas="$GRUPO/mae/preguntas.mae"
 archMaeEncuestadores="$GRUPO/mae/encuestadores.mae"
@@ -386,10 +370,30 @@ dirPreparados=$GRUPO"/preparados"
 dirListos=$GRUPO"/listos"
 dirRechazados=$GRUPO"/rechazados"
 
-
-
-
 ############################### Validación del entorno ################################
+
+variables=( GRUPO LIBDIR )
+
+for i in "${variables[@]}"; do
+	if [ ! ${!i} ]; then
+		echo "SEVERO - La variable \${i} no ha sido inicializada. Abortando la \
+ejecución"
+		exit $noVarReq
+	fi
+done
+
+if [ ! -f "$logcmd" ]; then
+	echo "SEVERO - No se ha encontrado el script para loguear \"$logcmd\". \
+Abortando la ejecución"
+	exit $noLogger
+fi
+
+if [ ! -f "$movercmd" ]; then
+	echo "SEVERO - No se ha encontrado el script para loguear \"$movercmd\". \
+Abortando la ejecución"
+	exit $noMover
+fi
+
 validarDirectoriosYArchivos
 ambienteValido=$?
 if [ $ambienteValido -ne 0 ] ; then
@@ -406,28 +410,28 @@ encuestas=($(cat "$archMaeEncuestas"))
 sc=,												# Separador de campos
 
 
-#: > "$archSumario" # TODO borrar, testing 
-#: > "$archEncuestasRech" # TODO borrar, testing 
-#: > "archivoDeLog" # TODO borrar, testing 
-
-
-
 regexEncuestador="^[0-9]{11}${sc}[^,]+${sc}[^,]{8}${sc}[0-9]{8}${sc}[0-9]{8}$"
-regexCabecera="^C${sc}[0-9]+${sc}[^,]{3}${sc}[0-9]*${sc}[PLESO]${sc}[^,]+${sc}(ID|II|RP|RC)\
-${sc}[ETCP]${sc}(ESP|MKT|VEN|LEG)${sc}.*$"
+regexCabecera="^C${sc}[0-9]+${sc}[^,]{3}${sc}[0-9]*${sc}[PLESO]${sc}[^,]+${sc}\
+(ID|II|RP|RC)${sc}[ETCP]${sc}(ESP|MKT|VEN|LEG)${sc}.*$"
 regexDetalle="^D${sc}[0-9]+${sc}[0-9]+${sc}.+${sc}.*$"
-regexDetalleSimple="^D.*$"
+regexDetalleSimple="^D,.*$"
 
 archivos=`ls "$dirPreparados" | cat`
 
-loguear $logInfo "Inicio procesamiento de archivos del directorio: \"$dirPreparados\""
+loguear $logInfo "Ha iniciado el procesamiento de archivos del directorio: \
+\"$dirPreparados\""
 
 for archivo in $archivos ; do
 
 	if [ -f "$dirListos/$archivo" ] ; then
 		loguear $logAlerta "El archivo \"$archivo\" ya se ha procesado. Será movido \
 al directorio directorio de rechazados."
-		mover "$dirPreparados/$archivo" "$dirRechazados" # TODO checkear si movio exitosamente
+		mover "$dirPreparados/$archivo" "$dirRechazados"
+		if [ $? -ne "0" ]; then
+			loguear $logFatal "No se ha movido con exito el archivo \
+\"$dirPreparados/$archivo\" al directorio \"$dirListos\". Abortando ejecución."
+			exit $moverError
+		fi
 		continue
 	fi
 	
@@ -437,18 +441,20 @@ al directorio directorio de rechazados."
 
 	validarUserId $userId
 	if [ "$?" -eq "$encuestadorIdError" ] ; then
-		loguear $logError "User Id de encuestador incorrecto. Archivo \"$archivo\"\
- rechazado"
+		loguear $logError "User Id de encuestador incorrecto. Archivo \"$archivo\" \
+rechazado"
 		cat "$GRUPO"/"$dirPreparados"/"$archivo" >> "$archEncuestasRech"
 		continue
 	fi
 
-	fechaEncuesta=`echo "$archivo" | cut -d "." -f 2` # TODO validar que sea una fecha valida
+	fechaEncuesta=`echo "$archivo" | cut -d "." -f 2`
 	lineas=($(cat "$dirPreparados"/"$archivo"))
 	cantidadLineas=${#lineas[@]}
 
 	formatoCabeceraValido=0
 	nroLineaActual=0
+
+	####################### Ciclo de Procesamiento de Encuestas #######################
 	while [ "$nroLineaActual" -lt "$cantidadLineas" ] ; do
 
 		########################## Valido formato cabecera ############################
@@ -459,11 +465,11 @@ al directorio directorio de rechazados."
 			formatoCabeceraValido=\
 `echo "${lineas[$nroLineaActual]}" | grep -E -c "$regexCabecera"`
 
-			if [ "$formatoCabeceraValido" -ne "1" ] ; then
+			if [ "$formatoCabeceraValido" -ne "1" ] ; then 
+				loguear $logError "Formato de cabecera incorrecto, rechazando \
+encuesta. Archivo \"$archivo\", línea número $nroLineaActual"
 				desecharBloque "$nroLineaActual" "nroLineaActual" \
-                                >> "$archEncuestasRech" 
-				loguear $logError "Formato de cabecera incorrecto, rechazando encuesta. \
-Archivo \"$archivo\", línea número $nroLineaActual"
+                                >> "$archEncuestasRech"
 			fi
 		done
 
@@ -486,7 +492,7 @@ Archivo \"$archivo\""
 		inicioBloque=$nroLineaActual
 		desecharBloque="false"
 
-		################################ Validaciones #################################
+		######################## Validaciones a nivel bloque ##########################
 		let "nroLineaActual += 1"
 		resultado=`validarCantidadPreguntas "$nroLineaActual" "$cantPregEsperadas"`
 		if [ "$resultado" -gt "0" ] ; then
@@ -510,9 +516,9 @@ encuesta. Dicha encuesta será rechazada."
 			desecharBloque="true"
 
 		elif [ `validarEncuestaRepetida "$nroEncuesta"` -ne "0" ] ; then
-			loguear $logError "Existe otra encuesta procesada previamente cuyo número \
-de encuesta coincide con el de la encuesta que se está procesando. La encuesta \
-número \"$nroEncuesta\" perteneciente al archivo \"$archivo\" será rechazada."
+			loguear $logError "Ya existe una encuesta cuyo número es \"$nroEncuesta\" \
+procesada. La encuesta del archivo \"$archivo\", linea \"$inicioBloque\" será \
+rechazada."
 			desecharBloque="true"
 
 		else
@@ -548,11 +554,23 @@ $puntajeTotal${sc}$codCliente${sc}$sitioEncuesta${sc}$modEncuesta${sc}\
 $personaEncuestada" >> "$archSumario"
 		fi
 
-	done # Fin procesamiento del bloque
+	done 
+	######################## Fin procesamiento de la encuesta #########################
 
-	mover "$dirPreparados/$archivo" "$dirListos" # TODO checkear si movio exitosamente
+	mover "$dirPreparados/$archivo" "$dirListos"
+
+	if [ $? -ne "0" ]; then
+		loguear $logFatal "No se ha movido con exito el archivo \
+\"$dirPreparados/$archivo\" al directorio \"$dirListos\". Abortando ejecución."
+		exit $moverError
+	fi
+
+	loguear $logInfo "Archivo: \"$archivo\" procesado correctamente."
 	
 done # Fin procesamiento del archivo
+
+loguear $logInfo "Ha finalizado el procesamiento de archivos del directorio: \
+\"$dirPreparados\""
 
 IFS=$origIfs
 
