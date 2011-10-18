@@ -1,9 +1,15 @@
+#!/bin/bash
+
 #stopD
 
-if [ -e  $GRUPO/lib/.data.txt ]; then
-	echo "parando demonio..";
-	rm $GRUPO/lib/.data.txt;
+ARCHIVO_CONF="$GRUPO/conf/instalarC.conf"
+
+. $ARCHIVO_CONF
+
+if [ -e  $LIBDIR/.data.txt ]; then
+	loguearC.sh stopD I "Parando el demonio"
+	rm $LIBDIR/.data.txt;
 else
-	echo "demonio ya parado";
+	loguearC.sh stopD A "El demonio ya fue detenido"
 fi
 
