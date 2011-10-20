@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl 
 # 
 # Funciones para ser utilizadas desde listarC.pl
 #
@@ -9,7 +9,7 @@
 
 
 #use strict;
-use warnings;
+#use warnings;
 
 package Lib;
 
@@ -147,17 +147,11 @@ sub mostrar_reporte {
 	print  $salida  "+-" . "-"x$ancho . "-+----------+----------+----------+\n";
 
 
-	$formato_stdout  = "format STDOUT=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
-	$formato_reporte = "format REPORTE=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
-	eval $formato_stdout;
+#	$formato_stdout  = "format STDOUT=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
+#	$formato_reporte = "format REPORTE=\n|@" ."$relleno | @>>>>>>> | @>>>>>>> | @>>>>>>> |\n".'$grupo, $verde, $amarillo, $rojo' . "\n.";
 
-# 	foreach $grupo (sort keys %reporte) {
-# 		#print "$key: $coins{$key}<br />";
-# 		$verde    = $reporte->{$grupo}{'verde'};
-# 		$amarillo = $reporte->{$grupo}{'amarillo'};
-# 		$rojo     = $reporte->{$grupo}{'rojo'};
-	#Util::hash_walk(\%reporte, [], \&Util::print_keys_and_value);
-
+#	eval $formato_reporte;
+#	eval $formato_stdout;
 
 	while ( ($grupo,$colores) = each(%reporte) ) {
 		$verde           = $colores->{'verde'};
@@ -170,7 +164,9 @@ sub mostrar_reporte {
 		$amarillo        = '--' if ! $amarillo;
 		$rojo            = '--' if ! $rojo;
 		if ($grupo) {
-			write  $salida;
+
+			printf $salida ("| %s | %8d | %8d | %8d |\n", $grupo, $verde, $amarillo, $rojo);
+#			write  $salida;
 		}
 	}
 	$grupo = 'Totales';
@@ -181,8 +177,8 @@ sub mostrar_reporte {
 	$verde    = '--' if ! $verde;
 	$amarillo = '--' if ! $amarillo;
 	$rojo     = '--' if ! $rojo;
-
-	write $salida;
+	printf $salida ("| %${ancho}s | %8d | %8d | %8d |\n", $grupo, $verde, $amarillo, $rojo);
+#	write $salida;
 	print  $salida  "+--" . "-"x$ancho . "+----------+----------+----------+\n";
 }
 
