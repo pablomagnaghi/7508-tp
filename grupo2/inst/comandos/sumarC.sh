@@ -233,6 +233,10 @@ validarUserId() {
 #======================================================================================
 validarCantidadPreguntas() {
 	aux="$1"
+	if [ -z "$2" -o -z "$1" ] ; then
+		echo "1"
+		return 0
+	fi
 	while [ "$aux" -le "${#lineas[@]}" -a  \
             `echo "${lineas[$aux]}" | grep -E -c "$regexDetalle"` -eq "1" ] ; do
 		let "aux += 1"
